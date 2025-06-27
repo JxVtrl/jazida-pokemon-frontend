@@ -6,6 +6,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001';
 console.log('🔧 Configuração da API:');
 console.log('   - NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
 console.log('   - URL final:', apiUrl);
+console.log('   - NODE_ENV:', process.env.NODE_ENV);
 
 const api = axios.create({
     baseURL: apiUrl,
