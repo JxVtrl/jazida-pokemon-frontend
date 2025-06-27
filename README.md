@@ -38,6 +38,16 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:4001
 NODE_ENV=development
 ```
 
+## 🌐 Ambiente de Produção
+
+- **URL do Frontend:** [https://jazida.pokemon.majorssolutions.com.br](https://jazida.pokemon.majorssolutions.com.br)
+- **URL da API Backend:** [https://jazida.api.majorssolutions.com.br](https://jazida.api.majorssolutions.com.br)
+
+**Configuração recomendada para produção (.env.production ou nas variáveis da Vercel):**
+```env
+NEXT_PUBLIC_API_URL=https://jazida.api.majorssolutions.com.br
+```
+
 ## 🚀 Executando o projeto
 
 ```bash
