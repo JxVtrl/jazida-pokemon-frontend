@@ -31,6 +31,7 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
             setTreinador("");
             onCreated?.();
         } catch (error) {
+            console.error(error);
             setErro("Erro ao criar pokémon.");
         }
     }
