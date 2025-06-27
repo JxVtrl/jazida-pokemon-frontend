@@ -73,15 +73,14 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     // Buscar pokémons do treinador
     fetchMyPokemons: async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
-            const response = await api.get('/me/pokemons', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            set({ myPokemons: response.data.pokemons || [] });
+            console.log('🔄 Buscando pokémons do treinador...');
+            const response = await api.get('/me/pokemons');
+            console.log('📦 Pokémons do treinador recebidos:', response.data);
+            set({ myPokemons: response.data || [] });
         } catch (error) {
-            console.error('Erro ao buscar pokémons:', error);
+            console.error('❌ Erro ao buscar pokémons do treinador:', error);
+            console.error('❌ Detalhes do erro:', error.response?.data);
+            set({ myPokemons: [] });
         }
     },
 
@@ -90,12 +89,14 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         const { trainer } = get();
         if (!trainer || get().socket) return;
 
+        console.log('🔗 Conectando socket para treinador:', trainer.id, trainer.nome);
+
         const socket = io(api.defaults.baseURL!, {
             transports: ['websocket'],
         });
 
         socket.on('connect', () => {
-            console.log('🔗 Socket conectado');
+            console.log('🔗 Socket conectado, registrando treinador:', trainer.id);
             socket.emit('register', trainer.id);
         });
 
@@ -123,6 +124,35 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
             });
         });
 
+        socket.on('battle:round', (data: {
+            round: number;
+            pokemonA: BattlePokemon;
+            pokemonB: BattlePokemon;
+            atacantePrimeiro: 'A' | 'B';
+            danoA: number;
+            danoB: number;
+        }) => {
+            console.log('🥊 Round da batalha recebido:', data);
+            console.log(`🥊 Round ${data.round}: ${data.atacantePrimeiro} atacou primeiro`);
+            console.log(`🥊 Dano A: ${data.danoA}, Dano B: ${data.danoB}`);
+            console.log(`🥊 Vida A: ${data.pokemonA.vida}, Vida B: ${data.pokemonB.vida}`);
+            
+            const { battle } = get();
+            if (battle) {
+                const newBattle = {
+                    ...battle,
+                    pokemonA: data.pokemonA,
+                    pokemonB: data.pokemonB,
+                    round: data.round,
+                    status: 'fighting'
+                };
+                console.log('🥊 Atualizando estado da batalha:', newBattle);
+                set({ battle: newBattle });
+            } else {
+                console.error('🥊 Erro: battle state não encontrado');
+            }
+        });
+
         socket.on('battle:update', (data: {
             pokemonA: BattlePokemon;
             pokemonB: BattlePokemon;
@@ -146,9 +176,10 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         socket.on('battle:end', (data: {
             winner: BattlePokemon;
             loser: BattlePokemon;
+            rounds: number;
         }) => {
             console.log('🏆 Batalha finalizada:', data);
-            const { battle } = get();
+            const { battle, trainer } = get();
             if (battle) {
                 set({
                     battle: {
@@ -158,6 +189,72 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                         status: 'finished'
                     }
                 });
+
+                // Determinar qual pokémon é do treinador atual
+                const myPokemon = battle.pokemonA.treinador === trainer?.id ? battle.pokemonA : battle.pokemonB;
+                const isWinner = data.winner.id === myPokemon.id;
+                const isLoser = data.loser.id === myPokemon.id;
+                
+                let result: 'victory' | 'defeat' | 'death';
+                if (isWinner) {
+                    result = 'victory';
+                } else if (isLoser && data.loser.nivel <= 0) {
+                    result = 'death';
+                } else {
+                    result = 'defeat';
+                }
+
+                // Calcular nível anterior
+                let nivelAnterior = myPokemon.nivel;
+                if (isWinner) {
+                    nivelAnterior = myPokemon.nivel - 1;
+                } else if (isLoser) {
+                    nivelAnterior = myPokemon.nivel + 1;
+                }
+
+                const battleResult = {
+                    pokemon: {
+                        ...myPokemon,
+                        nivelAnterior
+                    },
+                    result
+                };
+
+                localStorage.setItem('battleResult', JSON.stringify(battleResult));
+
+                // Redirecionar para home após 3 segundos
+                setTimeout(() => {
+                    if (typeof window !== 'undefined') {
+                        window.location.href = '/';
+                    }
+                }, 3000);
+            }
+        });
+
+        // Evento quando desafio é aceito
+        socket.on('battle-accepted', (data: {
+            battleId: string;
+            trainerAId: number;
+            trainerBId: number;
+            acceptedBy: number;
+        }) => {
+            console.log('✅ Desafio aceito:', data);
+            // Redirecionar para a página de batalha
+            if (typeof window !== 'undefined') {
+                window.location.href = `/batalha/${data.battleId}`;
+            }
+        });
+
+        // Evento quando outro treinador sai da batalha
+        socket.on('battle-player-left', (data: {
+            battleId: string;
+            trainerId: number;
+            message: string;
+        }) => {
+            console.log('🚪 Outro treinador saiu da batalha:', data);
+            // Mostrar alerta e redirecionar para home
+            if (typeof window !== 'undefined') {
+                window.location.href = '/';
             }
         });
 
@@ -174,11 +271,23 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
     // Ações da batalha
     joinBattle: (battleId: string) => {
-        const { socket } = get();
-        if (socket) {
-            socket.emit('join-battle', battleId);
-            console.log('🎯 Entrou na batalha:', battleId);
+        const { socket, trainer } = get();
+        if (!socket || !trainer) {
+            console.log('⚠️ Socket ou trainer não disponível para entrar na batalha');
+            return;
         }
+        
+        if (!socket.connected) {
+            console.log('⚠️ Socket não conectado, aguardando conexão...');
+            socket.once('connect', () => {
+                console.log('🔗 Socket conectado, agora entrando na batalha:', battleId);
+                socket.emit('join-battle', battleId);
+            });
+            return;
+        }
+        
+        socket.emit('join-battle', battleId);
+        console.log('🎯 Entrou na batalha:', battleId);
     },
 
     leaveBattle: () => {

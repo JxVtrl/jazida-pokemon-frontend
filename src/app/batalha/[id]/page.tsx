@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
 import { useAuth } from "@/context/AuthContext";
 import { useBattleStore } from "@/store/battleStore";
+import { getPokemonGifByLevel } from "@/utils/getPokemonGifByLevel";
+import api from "@/lib/api";
 
 interface BattlePokemon {
     id: number;
@@ -36,21 +38,29 @@ export default function BatalhaPage() {
     const [error, setError] = useState("");
     const [showPokemonSelector, setShowPokemonSelector] = useState(false);
     const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
+    const [pokemonsLoading, setPokemonsLoading] = useState(false);
+    const [aguardandoAdversario, setAguardandoAdversario] = useState(false);
+    const [loadingBg, setLoadingBg] = useState("/assets/gifs/loading.gif");
 
     useEffect(() => {
         if (!id || !user) return;
 
-        // Configurar treinador no store
+        // Primeiro configurar treinador no store
         setTrainer({ id: user.id, nome: user.nome });
 
-        // Conectar socket
+        // Depois conectar socket (que precisa do trainer configurado)
         connectSocket();
 
         // Buscar pokémons do treinador
-        fetchMyPokemons();
+        setPokemonsLoading(true);
+        fetchMyPokemons().finally(() => {
+            setPokemonsLoading(false);
+        });
 
-        // Entrar na batalha
-        joinBattle(id as string);
+        // Entrar na batalha (após um pequeno delay para garantir que o socket está conectado)
+        setTimeout(() => {
+            joinBattle(id as string);
+        }, 100);
 
         setLoading(false);
 
@@ -58,20 +68,55 @@ export default function BatalhaPage() {
             leaveBattle();
             disconnectSocket();
         };
-    }, [id, user]);
+    }, [id, user, setTrainer, connectSocket, fetchMyPokemons, joinBattle, leaveBattle, disconnectSocket]);
+
+    // Debug: logar pokémons quando mudarem
+    useEffect(() => {
+        console.log('🎯 Pokémons na página de batalha:', myPokemons);
+    }, [myPokemons]);
+
+    // Detectar quando o usuário sai da página
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            console.log('🚪 Usuário saindo da página de batalha');
+            leaveBattle();
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') {
+                console.log('🚪 Página ficou oculta');
+                leaveBattle();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [leaveBattle]);
 
     const handlePokemonSelect = async (pokemonId: number) => {
         setSelectedPokemonId(pokemonId);
         setShowPokemonSelector(false);
-
+        setAguardandoAdversario(true);
         try {
-            // Aqui você faria a chamada para iniciar a batalha
-            // Por enquanto, vamos simular
-            console.log('Pokémon selecionado:', pokemonId);
+            await api.post(`/batalha/${id}/iniciar`, { pokemonAId: pokemonId });
+            console.log('Pokémon selecionado e enviado para o backend:', pokemonId);
         } catch (error) {
             setError('Erro ao selecionar pokémon');
+            setAguardandoAdversario(false);
         }
     };
+
+    // Quando a batalha realmente começar, remove o estado de aguardando
+    useEffect(() => {
+        if (battle) {
+            setAguardandoAdversario(false);
+        }
+    }, [battle]);
 
     const getPokemonImage = (tipo: string) => {
         const images: { [key: string]: string } = {
@@ -100,202 +145,213 @@ export default function BatalhaPage() {
         return 'bg-red-500';
     };
 
-    if (loading) {
-        return (
-            <RequireAuth>
-                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900">
-                    <div className="text-center text-white">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-                        <p className="text-xl">Carregando batalha...</p>
+    // Sprites (agora usando GIFs)
+    const getSprite = (tipo: string, nivel: number, back = false) => {
+        // Se back, mostra o GIF de costas (ex: tipo-back.gif), senão o normal
+        let gifPath = getPokemonGifByLevel(tipo, nivel);
+        if (back) {
+            // Tenta buscar um gif de costas, se existir
+            const backGif = gifPath.replace('.gif', '-back.gif');
+            // Se existir o arquivo, usa ele. Caso contrário, usa o normal.
+            // Como não temos verificação de existência, sempre retorna o backGif (adicione os arquivos ou ajuste se necessário)
+            return <img src={backGif} alt={tipo + " costas"} className="w-32 h-32 object-contain mx-auto" />;
+        }
+        return <img src={gifPath} alt={tipo} className="w-32 h-32 object-contain mx-auto" />;
+    };
+
+    useEffect(() => {
+        const updateBg = () => {
+            if (typeof window !== "undefined") {
+                setLoadingBg(window.innerWidth <= 768 ? "/assets/gifs/loading_mobile.gif" : "/assets/gifs/loading.gif");
+            }
+        };
+        updateBg();
+        window.addEventListener("resize", updateBg);
+        return () => window.removeEventListener("resize", updateBg);
+    }, []);
+
+    // --- NOVA INTERFACE VISUAL CLÁSSICA POKÉMON ---
+    if (!battle) {
+        if (!aguardandoAdversario) {
+            // Mostrar seleção de pokémons
+            return (
+                <RequireAuth>
+                    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900">
+                        <div className="w-full max-w-2xl mx-auto mt-16 bg-black/40 rounded-xl p-8">
+                            <h2 className="text-2xl font-bold text-white mb-6">Selecione seu Pokémon</h2>
+                            {myPokemons.map((pokemon) => (
+                                <button
+                                    key={pokemon.id}
+                                    onClick={() => handlePokemonSelect(pokemon.id)}
+                                    className="bg-white/20 backdrop-blur-sm rounded-xl p-4 hover:bg-white/30 transition-all transform hover:scale-105 text-white font-semibold text-lg"
+                                >
+                                    {pokemon.tipo}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </RequireAuth>
-        );
+                </RequireAuth>
+            );
+        } else {
+            // Mostrar loading aguardando adversário
+            return (
+                <RequireAuth>
+                    <div className="min-h-screen flex items-center justify-center relative" style={{ background: `url(${loadingBg}) center center / cover no-repeat, linear-gradient(to bottom right, #1e3a8a, #6d28d9, #b91c1c)` }}>
+                        <div className="absolute inset-0" />
+                        <div className="text-center text-white z-10 w-full">
+                            <p className="text-2xl font-bold drop-shadow-lg">Aguardando o adversário escolher...</p>
+                        </div>
+                    </div>
+                </RequireAuth>
+            );
+        }
     }
 
-    if (error) {
-        return (
-            <RequireAuth>
-                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900">
-                    <div className="text-center text-white">
-                        <p className="text-red-400 mb-4">{error}</p>
-                        <button
-                            onClick={() => router.back()}
-                            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-                        >
-                            Voltar
-                        </button>
-                    </div>
-                </div>
-            </RequireAuth>
-        );
+    // Só executa daqui pra frente se battle existe
+    // Caixa de mensagem
+    let message = '';
+    if (battle.status === 'finished' && battle.winner && battle.loser) {
+        message = `Vitória de ${battle.winner.treinador || battle.winner.tipo}!`; 
+    } else if (battle.status === 'fighting') {
+        message = `Round ${battle.round} - A batalha está em andamento!`;
+    } else if (battle.status === 'starting') {
+        message = 'Preparando batalha...';
+    } else {
+        message = 'Aguardando ação dos treinadores...';
     }
+
+    // CORREÇÃO: Determinar qual pokémon é do treinador atual e qual é do adversário
+    const myPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonA : battle.pokemonB;
+    const opponentPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonB : battle.pokemonA;
+
+    const handleVoltarHome = () => {
+        // Salvar resultado da batalha no localStorage
+        if (battle && battle.winner && battle.loser) {
+            // Determinar qual pokémon é do treinador atual
+            const myPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonA : battle.pokemonB;
+            const isWinner = battle.winner.id === myPokemon.id;
+            const isLoser = battle.loser.id === myPokemon.id;
+            
+            // Determinar o resultado
+            let result: 'victory' | 'defeat' | 'death';
+            if (isWinner) {
+                result = 'victory';
+            } else if (isLoser && battle.loser.nivel <= 0) {
+                result = 'death';
+            } else {
+                result = 'defeat';
+            }
+
+            // Calcular nível anterior (reverter a mudança da batalha)
+            let nivelAnterior = myPokemon.nivel;
+            if (isWinner) {
+                nivelAnterior = myPokemon.nivel - 1; // Vencedor ganhou +1, então anterior = atual - 1
+            } else if (isLoser) {
+                nivelAnterior = myPokemon.nivel + 1; // Perdedor perdeu -1, então anterior = atual + 1
+            }
+
+            // Salvar dados da batalha
+            const battleResult = {
+                pokemon: {
+                    ...myPokemon,
+                    nivelAnterior
+                },
+                result
+            };
+
+            localStorage.setItem('battleResult', JSON.stringify(battleResult));
+        }
+
+        leaveBattle();
+        window.location.href = '/';
+    };
 
     return (
         <RequireAuth>
-            <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-red-900 p-4">
-                {/* Header */}
-                <div className="max-w-6xl mx-auto mb-6">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-bold text-white">⚔️ Batalha #{id}</h1>
-                        <button
-                            onClick={() => router.back()}
-                            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
-                        >
-                            Voltar
-                        </button>
-                    </div>
-                </div>
-
-                {/* Arena de Batalha */}
-                <div className="max-w-6xl mx-auto">
-                    {!battle ? (
-                        // Tela de seleção de pokémon
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center">
-                            <h2 className="text-2xl font-bold text-white mb-6">Selecione seu Pokémon</h2>
-
-                            {myPokemons.length === 0 ? (
-                                <div className="text-white">
-                                    <p className="mb-4">Você não tem pokémons para batalhar!</p>
-                                    <button
-                                        onClick={() => router.push('/')}
-                                        className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-                                    >
-                                        Criar Pokémon
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    {myPokemons.map((pokemon) => (
-                                        <button
-                                            key={pokemon.id}
-                                            onClick={() => handlePokemonSelect(pokemon.id)}
-                                            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 hover:bg-white/30 transition-all transform hover:scale-105"
-                                        >
-                                            <div className="text-4xl mb-2">{getPokemonImage(pokemon.tipo)}</div>
-                                            <div className="text-white font-semibold">{pokemon.tipo}</div>
-                                            <div className="text-white/70 text-sm">Nível {pokemon.nivel}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+            <div className="min-h-screen flex flex-col justify-between items-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900 p-4">
+                {/* Indicador de Round */}
+                {battle.status === 'fighting' && (
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+                        <div className="bg-red-600 text-white px-4 py-2 rounded-full font-bold text-lg shadow-lg">
+                            ROUND {battle.round}
                         </div>
-                    ) : (
-                        // Arena de batalha
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                            {/* Status da batalha */}
-                            <div className="text-center mb-8">
-                                <div className="text-white text-lg mb-2">
-                                    Round {battle.round} - {battle.status === 'fighting' ? '⚔️ Em batalha' :
-                                        battle.status === 'finished' ? '🏆 Finalizada' : '⏳ Aguardando'}
+                    </div>
+                )}
+
+                {/* Status dos pokémons */}
+                <div className="w-full max-w-2xl mx-auto flex flex-col gap-8 mt-8">
+                    {/* Oponente (Topo) */}
+                    {battle.pokemonB && (
+                        <div className="flex flex-col items-end">
+                            <div className="bg-white/80 rounded-lg shadow-lg px-4 py-2 w-72 mb-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-bold text-gray-800 text-lg">{battle.pokemonB.tipo}</span>
+                                    <span className="text-gray-700 font-mono">Lv{battle.pokemonB.nivel}</span>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs text-gray-600">HP</span>
+                                    <div className="flex-1 h-3 bg-gray-300 rounded-full overflow-hidden">
+                                        <div className={`h-3 transition-all duration-500 ${getHealthBarColor(battle.pokemonB.vida, battle.pokemonB.vidaMaxima)}`} style={{ width: `${(battle.pokemonB.vida / battle.pokemonB.vidaMaxima) * 100}%` }}></div>
+                                    </div>
+                                    <span className="text-xs text-gray-700 ml-2">{battle.pokemonB.vida}/{battle.pokemonB.vidaMaxima}</span>
                                 </div>
                             </div>
-
-                            {/* Pokémons */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                                {/* Pokémon A */}
-                                {battle.pokemonA && (
-                                    <div className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-xl p-6 border-2 border-blue-400">
-                                        <div className="text-center">
-                                            <div className="text-6xl mb-4">{getPokemonImage(battle.pokemonA.tipo)}</div>
-                                            <h3 className="text-2xl font-bold text-white mb-2">{battle.pokemonA.tipo}</h3>
-                                            <p className="text-white/70 mb-4">Nível {battle.pokemonA.nivel}</p>
-
-                                            {/* Barra de vida */}
-                                            <div className="mb-4">
-                                                <div className="flex justify-between text-white text-sm mb-1">
-                                                    <span>HP</span>
-                                                    <span>{battle.pokemonA.vida}/{battle.pokemonA.vidaMaxima}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-700 rounded-full h-3">
-                                                    <div
-                                                        className={`h-3 rounded-full transition-all duration-500 ${getHealthBarColor(battle.pokemonA.vida, battle.pokemonA.vidaMaxima)}`}
-                                                        style={{ width: `${(battle.pokemonA.vida / battle.pokemonA.vidaMaxima) * 100}%` }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Status */}
-                                            <div className={`text-lg font-semibold ${getStatusColor(battle.pokemonA.status)}`}>
-                                                {battle.pokemonA.status === 'attacking' ? '⚔️ Atacando' :
-                                                    battle.pokemonA.status === 'defending' ? '🛡️ Defendendo' :
-                                                        battle.pokemonA.status === 'fainted' ? '💀 Desmaiado' : '✅ Pronto'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* VS */}
-                                <div className="flex items-center justify-center">
-                                    <div className="text-6xl font-bold text-white animate-pulse">VS</div>
+                            {/* Sprite do oponente (frente) */}
+                            <div className="-mb-8 mt-2 flex justify-end w-full">
+                                <div className={`${battle.status === 'fighting' ? 'animate-pulse' : ''}`}>
+                                    {getSprite(battle.pokemonB.tipo, battle.pokemonB.nivel, false)}
                                 </div>
-
-                                {/* Pokémon B */}
-                                {battle.pokemonB && (
-                                    <div className="bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-xl p-6 border-2 border-red-400">
-                                        <div className="text-center">
-                                            <div className="text-6xl mb-4">{getPokemonImage(battle.pokemonB.tipo)}</div>
-                                            <h3 className="text-2xl font-bold text-white mb-2">{battle.pokemonB.tipo}</h3>
-                                            <p className="text-white/70 mb-4">Nível {battle.pokemonB.nivel}</p>
-
-                                            {/* Barra de vida */}
-                                            <div className="mb-4">
-                                                <div className="flex justify-between text-white text-sm mb-1">
-                                                    <span>HP</span>
-                                                    <span>{battle.pokemonB.vida}/{battle.pokemonB.vidaMaxima}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-700 rounded-full h-3">
-                                                    <div
-                                                        className={`h-3 rounded-full transition-all duration-500 ${getHealthBarColor(battle.pokemonB.vida, battle.pokemonB.vidaMaxima)}`}
-                                                        style={{ width: `${(battle.pokemonB.vida / battle.pokemonB.vidaMaxima) * 100}%` }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Status */}
-                                            <div className={`text-lg font-semibold ${getStatusColor(battle.pokemonB.status)}`}>
-                                                {battle.pokemonB.status === 'attacking' ? '⚔️ Atacando' :
-                                                    battle.pokemonB.status === 'defending' ? '🛡️ Defendendo' :
-                                                        battle.pokemonB.status === 'fainted' ? '💀 Desmaiado' : '✅ Pronto'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
-
-                            {/* Resultado final */}
-                            {battle.status === 'finished' && battle.winner && battle.loser && (
-                                <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-6">
-                                    <h2 className="text-3xl font-bold text-white mb-4">🏆 Batalha Finalizada!</h2>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Vencedor */}
-                                        <div className="bg-gradient-to-r from-yellow-400/30 to-yellow-600/30 rounded-xl p-4 border-2 border-yellow-400">
-                                            <h3 className="text-xl font-bold text-yellow-300 mb-2">🥇 Vencedor</h3>
-                                            <div className="text-4xl mb-2">{getPokemonImage(battle.winner.tipo)}</div>
-                                            <div className="text-white font-semibold">{battle.winner.tipo}</div>
-                                            <div className="text-white/70">Nível {battle.winner.nivel}</div>
-                                        </div>
-
-                                        {/* Perdedor */}
-                                        <div className="bg-gradient-to-r from-gray-400/30 to-gray-600/30 rounded-xl p-4 border-2 border-gray-400">
-                                            <h3 className="text-xl font-bold text-gray-300 mb-2">🥈 Perdedor</h3>
-                                            <div className="text-4xl mb-2">{getPokemonImage(battle.loser.tipo)}</div>
-                                            <div className="text-white font-semibold">{battle.loser.tipo}</div>
-                                            <div className="text-white/70">Nível {battle.loser.nivel}</div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={() => router.push('/')}
-                                        className="mt-6 bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 text-lg font-semibold"
-                                    >
-                                        Voltar ao Menu
-                                    </button>
-                                </div>
-                            )}
                         </div>
                     )}
+
+                    {/* Player (Baixo) */}
+                    {battle.pokemonA && (
+                        <div className="flex flex-col items-start mt-24">
+                            {/* Sprite do player (costas) */}
+                            <div className="-mb-8 flex justify-start w-full">
+                                <div className={`${battle.status === 'fighting' ? 'animate-pulse' : ''}`}>
+                                    {getSprite(battle.pokemonA.tipo, battle.pokemonA.nivel, true)}
+                                </div>
+                            </div>
+                            <div className="bg-white/80 rounded-lg shadow-lg px-4 py-2 w-72 mt-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-bold text-gray-800 text-lg">{battle.pokemonA.tipo}</span>
+                                    <span className="text-gray-700 font-mono">Lv{battle.pokemonA.nivel}</span>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="text-xs text-gray-600">HP</span>
+                                    <div className="flex-1 h-3 bg-gray-300 rounded-full overflow-hidden">
+                                        <div className={`h-3 transition-all duration-500 ${getHealthBarColor(battle.pokemonA.vida, battle.pokemonA.vidaMaxima)}`} style={{ width: `${(battle.pokemonA.vida / battle.pokemonA.vidaMaxima) * 100}%` }}></div>
+                                    </div>
+                                    <span className="text-xs text-gray-700 ml-2">{battle.pokemonA.vida}/{battle.pokemonA.vidaMaxima}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Caixa de mensagem */}
+                <div className="w-full max-w-2xl mx-auto mt-16 mb-8">
+                    <div className="bg-white/90 rounded-xl shadow-lg p-6 text-xl font-mono text-gray-800 text-center min-h-[64px] flex items-center justify-center">
+                        {battle.status === 'finished' && battle.winner && battle.loser ? (
+                            <div className="text-center">
+                                <div className="mb-4">
+                                    <span className="font-bold text-green-700 text-2xl mr-2">{battle.winner.treinador || battle.winner.tipo}</span>
+                                    venceu!
+                                    <span className="ml-4 text-gray-500 text-lg">({battle.loser.treinador || battle.loser.tipo} perdeu)</span>
+                                </div>
+                                <button
+                                    onClick={handleVoltarHome}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg"
+                                >
+                                    🏠 Voltar para Home
+                                </button>
+                            </div>
+                        ) : (
+                            <span>{message}</span>
+                        )}
+                    </div>
                 </div>
             </div>
         </RequireAuth>

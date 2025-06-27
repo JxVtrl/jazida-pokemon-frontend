@@ -23,8 +23,8 @@ export default function TrainerDashboard() {
         setLoading(true);
         setError("");
         try {
-            const res = await api.get("/pokemons/me/pokemons");
-            setPokemons(res.data);
+            const res = await api.get("/me/pokemons");
+            setPokemons(res.data || []);
         } catch (err: any) {
             setError("Erro ao buscar seus pokémons.");
         } finally {
@@ -42,7 +42,7 @@ export default function TrainerDashboard() {
         setError("");
         setLoading(true);
         try {
-            await api.post("/pokemons", {
+            await api.post("/api/pokemons", {
                 tipo: novoTipo,
                 treinador: user?.nome,
             });
