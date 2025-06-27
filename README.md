@@ -28,10 +28,10 @@ Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
 # API Backend
-NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_API_URL=http://localhost:4001
 
 # Socket.IO
-NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
+NEXT_PUBLIC_SOCKET_URL=http://localhost:4001
 
 # Ambiente
 NODE_ENV=development
