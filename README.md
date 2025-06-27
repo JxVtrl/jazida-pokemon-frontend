@@ -14,6 +14,7 @@ Interface inspirada no HUD clássico dos jogos de Pokémon, desenvolvida em Next
 
 ## 📦 Instalação
 
+
 ```bash
 # Instalar dependências
 npm install
@@ -275,8 +276,7 @@ netlify deploy --prod --dir=out
 ## 🔗 Links Úteis
 
 - **Backend API**: [Documentação](./../backend/README.md)
-- **Design System**: [Figma](https://figma.com/...)
-- **Deploy**: [Vercel](https://pokemon-battle.vercel.app)
+- **Deploy**: [Vercel](https://jazida.pokemon.majorssolutions.com.br/)
 
 ---
 
