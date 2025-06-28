@@ -14,7 +14,6 @@ Interface inspirada no HUD clássico dos jogos de Pokémon, desenvolvida em Next
 
 ## 📦 Instalação
 
-
 ```bash
 # Instalar dependências
 npm install
@@ -57,6 +56,40 @@ npm run lint
 npm run type-check
 ```
 
+---
+
+## 🧪 Testes
+
+O frontend possui **testes unitários, de integração e E2E** cobrindo toda a interface e lógica de interação.
+
+### **Testes Unitários**
+- Cobrem componentes isolados (`PokemonCard`, `PokemonForm`, `BattleHUD` etc)
+- Cobrem funções utilitárias e API
+- Executados com **Jest** e **Testing Library**
+
+```bash
+npm test
+```
+
+### **Testes de Integração**
+- Simulam fluxos completos de cadastro, edição, remoção e navegação entre abas
+- Mockam a API para garantir isolamento dos fluxos
+- Arquivo principal: `src/__tests__/integration/PokemonFlow.test.tsx`
+
+### **Testes E2E (End-to-End)**
+- Simulam o uso real da aplicação no navegador
+- Testam cadastro, listagem, batalha, responsividade, validação e loading
+- Executados com **Playwright**
+
+```bash
+npm run test:e2e
+```
+
+- Os testes E2E estão em `frontend/e2e/pokemon-flow.spec.ts`
+- Para rodar localmente, garanta que o backend esteja rodando e a aplicação acessível em `http://localhost:5173`
+
+---
+
 ## 🎨 Interface e Componentes
 
 ### 🎮 Layout Principal
@@ -95,127 +128,7 @@ Controles para iniciar batalhas:
 - Botão de iniciar batalha
 - Status da batalha atual
 
-## 🎨 Design System
-
-### Cores (Inspiradas no GameBoy)
-```css
---gameboy-green: #9bbc0f;
---gameboy-dark-green: #306230;
---gameboy-light-green: #8bac0f;
---gameboy-very-light-green: #306230;
-```
-
-### Tipografia
-- **Fonte principal**: 'Press Start 2P' (Google Fonts)
-- **Fonte secundária**: 'VT323' para elementos retro
-
-### Componentes Visuais
-- **Bordas**: Estilo pixel art
-- **Sombras**: Efeito de profundidade GameBoy
-- **Animações**: Transições suaves com suspense
-
-## 📱 Páginas
-
-### `/` - Dashboard Principal
-- Visão geral dos Pokémons
-- Estatísticas de batalhas
-- Acesso rápido às funcionalidades
-
-### `/pokemons` - Gerenciamento
-- Lista completa de Pokémons
-- CRUD operations
-- Filtros e busca
-
-### `/battle` - Arena de Batalha
-- Interface principal de batalha
-- Seleção de Pokémons
-- Simulação visual
-
-### `/history` - Histórico
-- Registro de batalhas anteriores
-- Estatísticas detalhadas
-- Rankings
-
-## 🔌 Integração com Backend
-
-### API Calls
-```typescript
-// Exemplo de chamada para API
-const createPokemon = async (data: PokemonFormData) => {
-  const response = await fetch(`${API_URL}/pokemons`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  return response.json();
-};
-```
-
-### Socket.IO Events
-```typescript
-// Conectar ao socket
-const socket = io(SOCKET_URL);
-
-// Escutar eventos de batalha
-socket.on('battle:start', (data) => {
-  // Iniciar animação de batalha
-});
-
-socket.on('battle:update', (data) => {
-  // Atualizar progresso da batalha
-});
-
-socket.on('battle:end', (data) => {
-  // Mostrar resultado final
-});
-```
-
-## 🎭 Animações e Efeitos
-
-### Batalha
-- **Entrada**: Pokémons aparecem com fade-in
-- **Ataques**: Efeitos de partículas e shake
-- **HP**: Barras diminuem gradualmente
-- **Vitória**: Confete e celebração
-- **Derrota**: Fade-out triste
-
-### Transições
-- **Páginas**: Slide transitions
-- **Modais**: Fade com backdrop
-- **Loading**: Spinner estilo GameBoy
-
-## 📊 Estado da Aplicação
-
-### Zustand Store
-```typescript
-interface PokemonStore {
-  pokemons: Pokemon[];
-  selectedPokemon: Pokemon | null;
-  battleState: BattleState;
-  isLoading: boolean;
-  
-  // Actions
-  fetchPokemons: () => Promise<void>;
-  createPokemon: (data: PokemonFormData) => Promise<void>;
-  startBattle: (pokemon1: number, pokemon2: number) => Promise<void>;
-}
-```
-
-## 🧪 Testes
-
-```bash
-# Executar testes
-npm test
-
-# Testes com watch mode
-npm run test:watch
-
-# Coverage
-npm run test:coverage
-
-# Testes E2E
-npm run test:e2e
-```
+---
 
 ## 📱 Responsividade
 
@@ -223,23 +136,7 @@ npm run test:e2e
 - **Tablet**: Layout adaptado sem sidebar
 - **Mobile**: Layout vertical otimizado
 
-## 🚀 Deploy
-
-### Vercel (Recomendado)
-```bash
-# Deploy automático
-vercel
-
-# Deploy com preview
-vercel --prod
-```
-
-### Netlify
-```bash
-# Build e deploy
-npm run build
-netlify deploy --prod --dir=out
-```
+---
 
 ## 📝 Scripts Disponíveis
 
@@ -252,26 +149,12 @@ netlify deploy --prod --dir=out
   "type-check": "tsc --noEmit",
   "test": "jest",
   "test:watch": "jest --watch",
-  "test:coverage": "jest --coverage"
+  "test:coverage": "jest --coverage",
+  "test:e2e": "playwright test e2e/"
 }
 ```
 
-## 🎮 Funcionalidades Especiais
-
-### Modo Nostálgico
-- Filtros visuais estilo CRT
-- Som de GameBoy (opcional)
-- Efeitos de scanlines
-
-### Modo Competitivo
-- Rankings de treinadores
-- Estatísticas detalhadas
-- Conquistas e badges
-
-### Modo Sandbox
-- Batalhas infinitas
-- Pokémons com níveis altos
-- Modo teste para desenvolvimento
+---
 
 ## 🔗 Links Úteis
 

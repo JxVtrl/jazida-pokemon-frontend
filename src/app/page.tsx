@@ -101,7 +101,7 @@ export default function Home() {
             />
           )}
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8">
-            {pokemons.map((pokemon) => (
+            {pokemons.sort((a, b) => b.nivel - a.nivel).map((pokemon) => (
               <PokemonCard key={pokemon.id} pokemon={pokemon} data-testid="pokemon-card" />
             ))}
           </div>
