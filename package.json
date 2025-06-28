@@ -10,7 +10,17 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:e2e": "playwright test e2e/"
+    "test:coverage:detailed": "jest --config jest.config.coverage.js",
+    "test:unit": "jest src/components/__tests__/",
+    "test:integration": "jest src/__tests__/integration/",
+    "test:utils": "jest src/lib/__tests__/",
+    "test:performance": "jest src/__tests__/performance/",
+    "test:snapshot": "jest --updateSnapshot",
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "test:e2e": "playwright test e2e/",
+    "test:e2e:headed": "playwright test e2e/ --headed",
+    "test:e2e:debug": "playwright test e2e/ --debug",
+    "test:all": "npm run test:ci && npm run test:e2e"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -39,6 +49,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/testing-library__react": "^10.0.1",
+    "@types/testing-library__user-event": "^4.1.1",
     "babel-jest": "^30.0.2",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",

@@ -1,10 +1,10 @@
-import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { render } from '@testing-library/react';
 import PokemonCard from '../PokemonCard';
 
-describe('PokemonCard', () => {
-    it('exibe nome, nível e treinador corretamente', () => {
-        render(
+describe('PokemonCard Snapshot Tests', () => {
+    it('renderiza Pikachu corretamente', () => {
+        const { container } = render(
             <PokemonCard
                 pokemon={{
                     id: 1,
@@ -14,31 +14,97 @@ describe('PokemonCard', () => {
                 }}
             />
         );
-        // O nome Pikachu aparece em mais de um lugar, então pegamos o primeiro (o do topo do card)
-        expect(screen.getAllByText(/Pikachu/i)[0]).toBeInTheDocument();
-        // Nível aparece como label, então buscamos pelo label
-        expect(screen.getByText(/Nível:/i)).toBeInTheDocument();
-        // O nível aparece como valor, mas pode haver outros números, então buscamos pelo papel de texto e valor
-        expect(screen.getAllByText('5').length).toBeGreaterThan(0);
-        // Treinador: Ash
-        expect(screen.getByText(/Ash/i)).toBeInTheDocument();
+
+        expect(container.firstChild).toMatchSnapshot();
     });
 
-    it('exibe o emoji ou imagem do tipo', () => {
-        render(
+    it('renderiza Charizard corretamente', () => {
+        const { container } = render(
             <PokemonCard
                 pokemon={{
                     id: 2,
                     tipo: 'charizard',
-                    treinador: 'Thiago',
-                    nivel: 3,
+                    treinador: 'Misty',
+                    nivel: 10,
                 }}
             />
         );
-        // O nome do tipo deve aparecer (primeira ocorrência é o nome do card)
-        expect(screen.getAllByText(/Charizard/i)[0]).toBeInTheDocument();
-        // O emoji pode ser encontrado pelo alt da imagem ou pelo emoji
-        // (Se usar imagem 8bit, pode testar pelo alt)
-        // expect(screen.getByAltText(/charizard/i)).toBeInTheDocument(); // se usar alt
+
+        expect(container.firstChild).toMatchSnapshot();
+    });
+
+    it('renderiza Mewtwo corretamente', () => {
+        const { container } = render(
+            <PokemonCard
+                pokemon={{
+                    id: 3,
+                    tipo: 'mewtwo',
+                    treinador: 'Brock',
+                    nivel: 15,
+                }}
+            />
+        );
+
+        expect(container.firstChild).toMatchSnapshot();
+    });
+
+    it('renderiza pokémon com nível alto', () => {
+        const { container } = render(
+            <PokemonCard
+                pokemon={{
+                    id: 4,
+                    tipo: 'pikachu',
+                    treinador: 'Treinador Experiente',
+                    nivel: 99,
+                }}
+            />
+        );
+
+        expect(container.firstChild).toMatchSnapshot();
+    });
+
+    it('renderiza pokémon com nome longo de treinador', () => {
+        const { container } = render(
+            <PokemonCard
+                pokemon={{
+                    id: 5,
+                    tipo: 'charizard',
+                    treinador: 'Treinador com Nome Muito Longo para Testar Quebra de Linha',
+                    nivel: 1,
+                }}
+            />
+        );
+
+        expect(container.firstChild).toMatchSnapshot();
+    });
+
+    it('renderiza pokémon com nível zero', () => {
+        const { container } = render(
+            <PokemonCard
+                pokemon={{
+                    id: 6,
+                    tipo: 'mewtwo',
+                    treinador: 'Novato',
+                    nivel: 0,
+                }}
+            />
+        );
+
+        expect(container.firstChild).toMatchSnapshot();
+    });
+
+    it('renderiza pokémon com tipo inválido', () => {
+        const { container } = render(
+            <PokemonCard
+                pokemon={{
+                    id: 7,
+                    tipo: 'invalid',
+                    treinador: 'Teste',
+                    nivel: 1,
+                }}
+            />
+        );
+
+        expect(container.firstChild).toMatchSnapshot();
     });
 }); 

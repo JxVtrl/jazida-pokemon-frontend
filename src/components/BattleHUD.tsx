@@ -125,7 +125,7 @@ export default function BattleHUD() {
         <div className="max-w-4xl mx-auto p-6 space-y-6 relative">
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center">
+                    <CardTitle className="text-2xl font-bold text-center" data-testid="battle-title">
                         ⚔️ Arena de Batalha Pokémon
                     </CardTitle>
                 </CardHeader>
@@ -133,16 +133,17 @@ export default function BattleHUD() {
                     {/* Pokémons Selecionados no topo */}
                     {(selectedPokemonA || selectedPokemonB) && (
                         <div className="mb-8 flex flex-col items-center">
-                            <h3 className="text-lg font-semibold mb-4">Pokémons para Batalha:</h3>
+                            <h3 className="text-lg font-semibold mb-4" data-testid="battle-selected-title">Pokémons para Batalha:</h3>
                             <div className="flex flex-row gap-8 justify-center items-center">
                                 {selectedPokemonA && (
-                                    <div className="relative">
-                                        <PokemonCard pokemon={selectedPokemonA} />
+                                    <div className="relative" data-testid="selected-pokemon-a">
+                                        <PokemonCard pokemon={selectedPokemonA} data-testid="pokemon-card-selected-a" />
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => setSelectedPokemonA(null)}
                                             className="absolute top-2 right-2 z-10"
+                                            data-testid="remove-pokemon-a"
                                         >
                                             Remover
                                         </Button>
@@ -152,13 +153,14 @@ export default function BattleHUD() {
                                     VS
                                 </div>
                                 {selectedPokemonB && (
-                                    <div className="relative">
-                                        <PokemonCard pokemon={selectedPokemonB} />
+                                    <div className="relative" data-testid="selected-pokemon-b">
+                                        <PokemonCard pokemon={selectedPokemonB} data-testid="pokemon-card-selected-b" />
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => setSelectedPokemonB(null)}
                                             className="absolute top-2 right-2 z-10"
+                                            data-testid="remove-pokemon-b"
                                         >
                                             Remover
                                         </Button>
@@ -173,6 +175,7 @@ export default function BattleHUD() {
                                         disabled={isBattling}
                                         size="lg"
                                         className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg"
+                                        data-testid="battle-button"
                                     >
                                         {isBattling ? (
                                             <>
@@ -193,16 +196,18 @@ export default function BattleHUD() {
                         <Button
                             onClick={() => setDrawerOpen(true)}
                             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg"
+                            data-testid="open-drawer-button"
                         >
                             Selecionar Pokémons
                         </Button>
                         {/* Drawer */}
                         <div className={`fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-2xl transition-transform duration-300 ${drawerOpen ? 'translate-y-0' : 'translate-y-full'} max-h-[70vh] overflow-y-auto rounded-t-2xl`}
                             style={{ minHeight: '300px' }}
+                            data-testid="drawer-selector"
                         >
                             <div className="flex justify-between items-center px-6 pt-4 pb-2">
                                 <h3 className="text-lg font-bold">Selecione dois pokémons para batalhar</h3>
-                                <Button variant="ghost" onClick={() => setDrawerOpen(false)}>
+                                <Button variant="ghost" onClick={() => setDrawerOpen(false)} data-testid="close-drawer-button">
                                     Fechar
                                 </Button>
                             </div>
@@ -227,8 +232,9 @@ export default function BattleHUD() {
                                                     handlePokemonSelect(pokemon, false);
                                                 }
                                             }}
+                                            data-testid={`drawer-pokemon-${pokemon.id}`}
                                         >
-                                            <PokemonCard pokemon={pokemon} />
+                                            <PokemonCard pokemon={pokemon} data-testid="pokemon-card" />
                                         </div>
                                     ))}
                                 </div>
@@ -239,23 +245,24 @@ export default function BattleHUD() {
                             <div
                                 className="fixed inset-0 bg-black bg-opacity-30 z-40"
                                 onClick={() => setDrawerOpen(false)}
+                                data-testid="drawer-overlay"
                             />
                         )}
                     </div>
 
                     {/* Animação de Batalha */}
                     {isBattling && (
-                        <div className="text-center py-8">
+                        <div className="text-center py-8" data-testid="battle-animation">
                             <div className="flex justify-center items-center space-x-8 mb-4">
                                 <div className="text-center">
-                                    <div className="text-4xl mb-2">{selectedPokemonA && <PokemonCard pokemon={selectedPokemonA} />}</div>
+                                    <div className="text-4xl mb-2">{selectedPokemonA && <PokemonCard pokemon={selectedPokemonA} data-testid="pokemon-card-battle-a" />}</div>
                                     <div className="w-32 bg-gray-200 rounded-full h-2">
                                         <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
                                     </div>
                                 </div>
                                 <div className="text-2xl animate-bounce">⚔️</div>
                                 <div className="text-center">
-                                    <div className="text-4xl mb-2">{selectedPokemonB && <PokemonCard pokemon={selectedPokemonB} />}</div>
+                                    <div className="text-4xl mb-2">{selectedPokemonB && <PokemonCard pokemon={selectedPokemonB} data-testid="pokemon-card-battle-b" />}</div>
                                     <div className="w-32 bg-gray-200 rounded-full h-2">
                                         <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{ width: '40%' }}></div>
                                     </div>
@@ -267,7 +274,7 @@ export default function BattleHUD() {
 
                     {/* Resultado da Batalha */}
                     {battleResult && (
-                        <Card className="border-2 border-green-500 bg-green-50">
+                        <Card className="border-2 border-green-500 bg-green-50" data-testid="battle-result">
                             <CardHeader>
                                 <CardTitle className="text-center text-green-700">
                                     🏆 Resultado da Batalha
@@ -276,7 +283,7 @@ export default function BattleHUD() {
                             <CardContent>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     {/* Vencedor */}
-                                    <Card className="border-2 border-yellow-400 bg-yellow-50">
+                                    <Card className="border-2 border-yellow-400 bg-yellow-50" data-testid="battle-winner">
                                         <CardContent className="p-4 text-center">
                                             <div className="text-4xl mb-2">🏆</div>
                                             <h4 className="font-bold text-lg capitalize text-yellow-800">
@@ -298,7 +305,7 @@ export default function BattleHUD() {
                                     <Card className={`border-2 ${battleResult.perdedor.removido
                                         ? 'border-red-500 bg-red-50'
                                         : 'border-gray-400 bg-gray-50'
-                                        }`}>
+                                        }`} data-testid="battle-loser">
                                         <CardContent className="p-4 text-center">
                                             <div className="text-4xl mb-2">
                                                 {battleResult.perdedor.removido ? '💀' : '💔'}
@@ -328,7 +335,7 @@ export default function BattleHUD() {
 
                     {/* Mensagem de Erro */}
                     {error && (
-                        <Card className="border-2 border-red-500 bg-red-50">
+                        <Card className="border-2 border-red-500 bg-red-50" data-testid="battle-error">
                             <CardContent className="p-4 text-center">
                                 <p className="text-red-700 font-semibold">❌ {error}</p>
                             </CardContent>

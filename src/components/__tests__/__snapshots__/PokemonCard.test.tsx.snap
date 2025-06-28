@@ -1,0 +1,785 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`PokemonCard Snapshot Tests renderiza Charizard corretamente 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-orange-50 border-orange-400 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        Charizard
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        150
+         
+        <span
+          class="text-xl"
+        >
+          🔥
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <img
+        alt="Charizard"
+        class="w-auto mb-1 drop-shadow-lg h-[100%]"
+        src="/gifs/charizard.gif"
+      />
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        2
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          10
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Misty
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Fire Spin
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          200
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Suas asas podem carregá-lo até altitudes elevadas. Cospe fogo a temperaturas altíssimas.
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PokemonCard Snapshot Tests renderiza Mewtwo corretamente 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-purple-50 border-purple-400 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        Mewtwo
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        130
+         
+        <span
+          class="text-xl"
+        >
+          🧬
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <img
+        alt="Mewtwo"
+        class="w-auto mb-1 drop-shadow-lg h-[100%]"
+        src="/gifs/mewtwo.gif"
+      />
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        3
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          15
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Brock
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Psypump
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          90
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Criado a partir do DNA de Mew, dizem que tem o coração mais selvagem entre os Pokémon.
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PokemonCard Snapshot Tests renderiza Pikachu corretamente 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-yellow-50 border-yellow-400 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        Pikachu
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        60
+         
+        <span
+          class="text-xl"
+        >
+          ⚡
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <img
+        alt="Pikachu"
+        class="w-auto mb-1 drop-shadow-lg h-[100%]"
+        src="/gifs/pikachu.gif"
+      />
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        1
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          5
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Ash
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Bola Elétrica
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          30
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Quando Pikachu se encontram, encostam suas caudas e trocam eletricidade como saudação.
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PokemonCard Snapshot Tests renderiza pokémon com nome longo de treinador 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-orange-50 border-orange-400 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        Charizard
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        150
+         
+        <span
+          class="text-xl"
+        >
+          🔥
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <img
+        alt="Charizard"
+        class="w-auto mb-1 drop-shadow-lg h-[100%]"
+        src="/gifs/charizard.gif"
+      />
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        5
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          1
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Treinador com Nome Muito Longo para Testar Quebra de Linha
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Fire Spin
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          200
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Suas asas podem carregá-lo até altitudes elevadas. Cospe fogo a temperaturas altíssimas.
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PokemonCard Snapshot Tests renderiza pokémon com nível alto 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-yellow-50 border-yellow-400 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        Pikachu
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        60
+         
+        <span
+          class="text-xl"
+        >
+          ⚡
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <img
+        alt="Pikachu"
+        class="w-auto mb-1 drop-shadow-lg h-[100%]"
+        src="/gifs/pikachu.gif"
+      />
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        4
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          99
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Treinador Experiente
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Bola Elétrica
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          30
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Quando Pikachu se encontram, encostam suas caudas e trocam eletricidade como saudação.
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PokemonCard Snapshot Tests renderiza pokémon com nível zero 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-purple-50 border-purple-400 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        Mewtwo
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        130
+         
+        <span
+          class="text-xl"
+        >
+          🧬
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <img
+        alt="Mewtwo"
+        class="w-auto mb-1 drop-shadow-lg h-[100%]"
+        src="/gifs/mewtwo.gif"
+      />
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        6
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          0
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Novato
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Psypump
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          90
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Criado a partir do DNA de Mew, dizem que tem o coração mais selvagem entre os Pokémon.
+    </div>
+  </div>
+</div>
+`;
+
+exports[`PokemonCard Snapshot Tests renderiza pokémon com tipo inválido 1`] = `
+<div
+  class="rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden bg-gray-100 border-gray-300 w-[250px]"
+  data-testid="pokemon-card"
+  style="aspect-ratio: 5 / 7;"
+>
+  <div
+    class="absolute inset-0 flex flex-col min-w-0 gap-1"
+  >
+    <div
+      class="flex items-center px-3 pt-2 pb-1 min-w-0"
+    >
+      <span
+        class="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0"
+        style="font-size: 1rem; max-width: 110px; line-height: 1.1;"
+      >
+        invalid
+      </span>
+      <span
+        class="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap"
+        style="font-size: 0.9rem;"
+      >
+        HP 
+        50
+         
+        <span
+          class="text-xl"
+        >
+          ❓
+        </span>
+      </span>
+    </div>
+    <div
+      class="border-t border-yellow-300 mx-2 mb-1"
+    />
+    <div
+      class="flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0"
+    >
+      <div
+        class="text-7xl mb-1 drop-shadow-lg"
+      >
+        ❓
+      </div>
+      <div
+        class="text-xs text-gray-500 mb-1"
+      >
+        ID: 
+        7
+      </div>
+    </div>
+    <div
+      class="bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0"
+    >
+      <div
+        class="flex justify-between items-center mb-1 min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Nível:
+        </span>
+        <span
+          class="font-bold text-gray-800"
+        >
+          1
+        </span>
+      </div>
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-semibold text-gray-700"
+        >
+          Treinador:
+        </span>
+        <span
+          class="font-bold text-blue-700 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Teste
+        </span>
+      </div>
+    </div>
+    <div
+      class="mx-2 mb-1 bg-gradient-to-r from-white via-gray-50 to-white rounded px-1 py-0.5 border border-gray-200 shadow-sm text-[10px] min-w-0"
+    >
+      <div
+        class="flex justify-between items-center min-w-0 text-[10px]"
+      >
+        <span
+          class="font-bold text-gray-800 break-words min-w-0 max-w-[90px]"
+          style="word-break: break-word;"
+        >
+          Ataque Desconhecido
+        </span>
+        <span
+          class="font-bold text-gray-700"
+        >
+          0
+        </span>
+      </div>
+    </div>
+    <div
+      class="pb-1 italic text-gray-500 text-center text-[10px] break-words min-w-0"
+      style="word-break: break-word;"
+    >
+      Pokémon misterioso.
+    </div>
+  </div>
+</div>
+`;

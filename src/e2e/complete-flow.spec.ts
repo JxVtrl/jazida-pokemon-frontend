@@ -12,16 +12,16 @@ test.describe('Fluxo completo da aplicação', () => {
         await page.getByRole('button', { name: '+ Adicionar Pokémon' }).click();
 
         // Preencher formulário
-        await page.getByLabel('mewtwo').click();
+        await page.getByLabel('mewtwo').check();
         await page.getByLabel(/treinador/i).fill('E2E Test');
         await page.getByLabel(/nível/i).fill('15');
 
         // Submeter
         await page.getByRole('button', { name: /criar pokémon/i }).click();
 
-        // Verificar se foi criado (usar seletor mais específico)
-        await expect(page.locator('[data-testid="pokemon-card"]').filter({ hasText: 'Mewtwo' }).first()).toBeVisible();
-        await expect(page.getByText('E2E Test').first()).toBeVisible();
+        // Verificar se foi criado
+        await expect(page.getByText('Mewtwo')).toBeVisible();
+        await expect(page.getByText('E2E Test')).toBeVisible();
 
         // 3. Navegar para arena de batalha
         await page.getByRole('button', { name: /arena de batalha/i }).click();
@@ -32,22 +32,9 @@ test.describe('Fluxo completo da aplicação', () => {
         // 4. Selecionar pokémons para batalha
         await page.getByRole('button', { name: /selecionar pokémons/i }).click();
 
-        // Selecionar dois pokémons diferentes
-        const cards = await page.locator('[data-testid^="drawer-pokemon-"]').all();
-        let selected = 0;
-        let lastId = null;
-        for (const card of cards) {
-            const testid = await card.getAttribute('data-testid');
-            const id = testid?.split('-').pop();
-            if (id !== lastId) {
-                await card.click();
-                selected++;
-                lastId = id;
-            }
-            if (selected === 2) break;
-        }
-        // Fechar o drawer antes de batalhar
-        await page.getByTestId('close-drawer-button').click();
+        // Selecionar dois pokémons
+        await page.getByText('Pikachu').first().click();
+        await page.getByText('Charizard').first().click();
 
         // Verificar se aparecem na arena
         await expect(page.getByText('Pokémons para Batalha:')).toBeVisible();
@@ -69,7 +56,7 @@ test.describe('Fluxo completo da aplicação', () => {
         await expect(page.getByText('📋 Lista de Pokémons')).toBeVisible();
 
         // Verificar se pokémons ainda estão lá
-        await expect(page.locator('[data-testid="pokemon-card"]').filter({ hasText: 'Mewtwo' }).first()).toBeVisible();
+        await expect(page.getByText('Mewtwo')).toBeVisible();
     });
 
     test('testa responsividade em mobile', async ({ page }) => {
@@ -99,7 +86,7 @@ test.describe('Fluxo completo da aplicação', () => {
 
         // Tentar cadastrar pokémon
         await page.getByRole('button', { name: '+ Adicionar Pokémon' }).click();
-        await page.getByLabel('pikachu').click();
+        await page.getByLabel('pikachu').check();
         await page.getByLabel(/treinador/i).fill('Error Test');
         await page.getByRole('button', { name: /criar pokémon/i }).click();
 
@@ -129,23 +116,22 @@ test.describe('Fluxo completo da aplicação', () => {
     test('testa performance e loading states', async ({ page }) => {
         await page.goto('http://localhost:5173');
 
-        // Aguardar carregamento completo (removido verificação de loading que não existe)
+        // Verificar se loading aparece inicialmente
+        await expect(page.getByText(/carregando/i)).toBeVisible({ timeout: 5000 });
+
+        // Aguardar carregamento completo
         await expect(page.getByText('Pikachu')).toBeVisible({ timeout: 10000 });
 
         // Testar loading no formulário
         await page.getByRole('button', { name: '+ Adicionar Pokémon' }).click();
-        await page.getByLabel('pikachu').click();
+        await page.getByLabel('pikachu').check();
         await page.getByLabel(/treinador/i).fill('Performance Test');
         await page.getByRole('button', { name: /criar pokémon/i }).click();
 
-        // Verificar loading state (se existir)
-        try {
-            await expect(page.getByText(/criando/i)).toBeVisible({ timeout: 2000 });
-        } catch {
-            // Se não aparecer loading, continuar
-        }
+        // Verificar loading state
+        await expect(page.getByText(/criando/i)).toBeVisible();
 
         // Aguardar conclusão
-        await expect(page.getByText('Performance Test').first()).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText('Performance Test')).toBeVisible({ timeout: 10000 });
     });
 }); 

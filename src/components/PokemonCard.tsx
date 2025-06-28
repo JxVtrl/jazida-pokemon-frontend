@@ -15,6 +15,7 @@ type Pokemon = {
 
 type PokemonCardProps = {
     pokemon: Pokemon;
+    'data-testid'?: string;
 };
 
 const cardConfig = {
@@ -50,7 +51,7 @@ const cardConfig = {
     }
 };
 
-export default function PokemonCard({ pokemon }: PokemonCardProps) {
+export default function PokemonCard({ pokemon, 'data-testid': testId }: PokemonCardProps) {
     const config = cardConfig[pokemon.tipo as keyof typeof cardConfig] || {
         color: "bg-gray-100 border-gray-300",
         hp: 50,
@@ -64,8 +65,10 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
     const gifSrc = gifMap[pokemon.tipo] || null;
     const cardSize = 'w-[250px]';
     return (
-        <div className={`rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden ${config.color} ${cardSize}`}
+        <div
+            className={`rounded-2xl border-8 shadow-xl mx-auto bg-gradient-to-b from-yellow-100 to-white relative overflow-hidden ${config.color} ${cardSize}`}
             style={{ aspectRatio: '5 / 7' }}
+            data-testid={testId || 'pokemon-card'}
         >
             <div className="absolute inset-0 flex flex-col min-w-0 gap-1">
                 {/* Topo: Nome, HP, energia */}
