@@ -143,7 +143,7 @@ export default function TrainerList() {
             </div>
 
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {trainers.map((trainer) => (
+                {trainers.filter((trainer) => trainer.id !== user?.id).map((trainer) => (
                     <div 
                         key={trainer.id}
                         className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-100"
@@ -166,9 +166,8 @@ export default function TrainerList() {
                             </div>
                         </div>
 
-                        {/* Estatísticas */}
+                        {/* 
                         <div className="space-y-3">
-                            {/* Nível e Experiência */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-600">Nível</span>
                                 <span className={`font-bold ${getLevelColor(trainer.level)}`}>
@@ -176,7 +175,6 @@ export default function TrainerList() {
                                 </span>
                             </div>
 
-                            {/* Taxa de Vitória */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-600">Taxa de Vitória</span>
                                 <span className={`font-bold ${getWinRateColor(trainer.winRate)}`}>
@@ -184,7 +182,6 @@ export default function TrainerList() {
                                 </span>
                             </div>
 
-                            {/* Total de Batalhas */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-600">Total de Batalhas</span>
                                 <span className="font-bold text-gray-800">
@@ -192,7 +189,6 @@ export default function TrainerList() {
                                 </span>
                             </div>
 
-                            {/* Vitórias e Derrotas */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-600">Vitórias</span>
                                 <span className="font-bold text-green-600">
@@ -207,14 +203,14 @@ export default function TrainerList() {
                                 </span>
                             </div>
 
-                            {/* Experiência */}
                             <div className="flex justify-between items-center">
                                 <span className="text-sm text-gray-600">Experiência</span>
                                 <span className="font-bold text-blue-600">
                                     {trainer.experience}
                                 </span>
                             </div>
-                        </div>
+                        </div> 
+                        */}
 
                         {/* Botão de Desafio */}
                         <div className="mt-4 pt-4 border-t border-gray-100">
