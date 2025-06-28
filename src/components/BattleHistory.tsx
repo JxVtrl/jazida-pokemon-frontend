@@ -27,10 +27,12 @@ export default function BattleHistory() {
     const fetchHistorico = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/batalhas/historico');
+            console.log('🔍 Buscando histórico de batalhas...');
+            const response = await api.get('/battle-history');
+            console.log('✅ Histórico recebido:', response.data);
             setHistorico(response.data);
         } catch (error) {
-            console.error('Erro ao buscar histórico:', error);
+            console.error('❌ Erro ao buscar histórico:', error);
             setError('Erro ao carregar histórico de batalhas');
         } finally {
             setLoading(false);

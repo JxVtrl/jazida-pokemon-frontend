@@ -98,6 +98,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         socket.on('connect', () => {
             console.log('🔗 Socket conectado, registrando treinador:', trainer.id);
             socket.emit('register', trainer.id);
+            socket.emit('join-trainer-room', trainer.id);
         });
 
         socket.on('disconnect', () => {

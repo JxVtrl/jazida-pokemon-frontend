@@ -6,7 +6,9 @@ import BattleHUD from "@/components/BattleHUD";
 import TrainerDashboard from "@/components/TrainerDashboard";
 import TrainerList from "@/components/TrainerList";
 import BattleHistory from "@/components/BattleHistory";
+import ProfileTab from "@/components/ProfileTab";
 import BattleResultModal from "@/components/BattleResultModal";
+import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import RequireAuth from "@/components/RequireAuth";
@@ -33,7 +35,7 @@ interface BattleResult {
 
 export default function Home() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [activeTab, setActiveTab] = useState<'list' | 'battle' | 'dashboard' | 'challenges' | 'history'>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'battle' | 'challenges' | 'history' | 'profile'>('list');
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
   const [showBattleModal, setShowBattleModal] = useState(false);
   const { user, logout } = useAuth();
@@ -98,99 +100,47 @@ export default function Home() {
 
   return (
     <RequireAuth>
-      <main className="min-h-screen p-4 bg-gray-100">
+      <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-4xl font-bold text-gray-800">
-              🎮 Jazida Pokémon Challenge
-            </h1>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-700 text-sm">{user?.nome}</span>
-              <button
-                onClick={logout}
-                className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm font-medium"
-              >
-                Sair
-              </button>
-            </div>
-          </div>
+        <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* Tabs */}
-          <div className="flex justify-center mb-6">
-            <div className="bg-white rounded-lg p-1 shadow-md flex flex-wrap">
-              <button
-                onClick={() => setActiveTab('list')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors text-sm ${activeTab === 'list'
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-600 hover:text-gray-800'
-                  }`}
-              >
-                📋 Ranking
-              </button>
-              {/* <button
-                onClick={() => setActiveTab('battle')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors text-sm ${activeTab === 'battle'
-                  ? 'bg-red-500 text-white'
-                  : 'text-gray-600 hover:text-gray-800'
-                  }`}
-              >
-                ⚔️ Arena
-              </button> */}
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors text-sm ${activeTab === 'dashboard'
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-600 hover:text-gray-800'
-                  }`}
-              >
-                🧑‍🎓 Meus Pokémons
-              </button>
-              <button
-                onClick={() => setActiveTab('challenges')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors text-sm ${activeTab === 'challenges'
-                  ? 'bg-purple-600 text-white'
-                  : 'text-gray-600 hover:text-gray-800'
-                  }`}
-              >
-                🥊 Desafios
-              </button>
-              <button
-                onClick={() => setActiveTab('history')}
-                className={`px-4 py-2 rounded-md font-medium transition-colors text-sm ${activeTab === 'history'
-                  ? 'bg-orange-600 text-white'
-                  : 'text-gray-600 hover:text-gray-800'
-                  }`}
-              >
-                📜 Histórico
-              </button>
-            </div>
+        {/* Conteúdo Principal */}
+        <main className="pt-6 pb-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Content */}
+            {activeTab === 'list' ? (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">🏆 Ranking de Pokémons</h2>
+                  <p className="text-gray-600">Veja todos os pokémons ordenados por nível</p>
+                </div>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  {pokemons.sort((a, b) => b.nivel - a.nivel).map((pokemon) => (
+                    <PokemonCard key={pokemon.id} pokemon={pokemon} />
+                  ))}
+                </div>
+              </div>
+            ) : activeTab === 'challenges' ? (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">🥊 Treinadores Online</h2>
+                  <p className="text-gray-600">Desafie outros treinadores para batalhas</p>
+                </div>
+                <TrainerList />
+              </div>
+            ) : activeTab === 'history' ? (
+              <div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">📜 Histórico de Batalhas</h2>
+                  <p className="text-gray-600">Reviva suas batalhas mais memoráveis</p>
+                </div>
+                <BattleHistory />
+              </div>
+            ) : (
+              <ProfileTab />
+            )}
           </div>
-        </div>
-
-        {/* Content */}
-        {activeTab === 'list' ? (
-          <div className="max-w-6xl mx-auto">
-            {/* <PokemonForm onCreated={fetchData} /> */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8">
-              {pokemons.sort((a, b) => b.nivel - a.nivel).map((pokemon) => {
-                return (
-                  <PokemonCard key={pokemon.id} pokemon={pokemon} />
-                )
-              })}
-            </div>
-          </div>
-        ) : activeTab === 'battle' ? (
-          <BattleHUD />
-        ) : activeTab === 'dashboard' ? (
-          <TrainerDashboard />
-        ) : activeTab === 'challenges' ? (
-          <TrainerList />
-        ) : (
-          <div className="max-w-4xl mx-auto">
-            <BattleHistory />
-          </div>
-        )}
+        </main>
 
         {/* Battle Result Modal */}
         <BattleResultModal
@@ -199,7 +149,7 @@ export default function Home() {
           pokemon={battleResult?.pokemon || null}
           result={battleResult?.result || null}
         />
-      </main>
+      </div>
     </RequireAuth>
   );
 }

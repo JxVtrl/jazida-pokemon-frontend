@@ -8,41 +8,53 @@ import { useBattleStore } from "@/store/battleStore";
 interface User {
     id: number;
     nome: string;
+    avatar_url?: string;
 }
 
 interface AuthContextType {
     user: User | null;
     token: string | null;
     loading: boolean;
-    login: (nome: string, senha: string) => Promise<void>;
+    login: (token: string, userData: User) => void;
     register: (nome: string, senha: string) => Promise<void>;
     logout: () => void;
+    updateUser: (userData: Partial<User>) => void;
+    isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [showBattleInvite, setShowBattleInvite] = useState(false);
     const [inviteData, setInviteData] = useState<any>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
     const { setTrainer, connectSocket, disconnectSocket, socket } = useBattleStore();
 
-    // Carregar do localStorage ao iniciar
     useEffect(() => {
-        const storedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
-            api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+        // Verificar se há token no localStorage
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+
+        if (token && userData) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                setUser(parsedUser);
+                setToken(token);
+                setIsAuthenticated(true);
+                api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } catch (error) {
+                console.error('Erro ao parsear dados do usuário:', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
         }
         setLoading(false);
     }, []);
 
-    // Persistir token/user no localStorage e conectar socket
     useEffect(() => {
         if (token && user) {
             localStorage.setItem('token', token);
@@ -58,7 +70,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [token, user, setTrainer, connectSocket, disconnectSocket]);
 
-    // Listener global para convites de batalha
     useEffect(() => {
         if (!socket || !user) return;
 
@@ -79,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleAcceptInvite = async () => {
         try {
-            await api.post(`/desafiar/aceitar/${inviteData.battleId}`);
+            await api.post(`/batalha/aceitar/${inviteData.challengeId}`);
             setShowBattleInvite(false);
             setInviteData(null);
             // O redirecionamento será feito automaticamente pelo socket
@@ -96,17 +107,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setInviteData(null);
     };
 
-    const login = async (nome: string, senha: string) => {
-        setLoading(true);
-        try {
-            const res = await api.post('/auth/login', { nome, senha });
-            setToken(res.data.token);
-            setUser(res.data.treinador);
-            api.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-            router.push('/');
-        } finally {
-            setLoading(false);
-        }
+    const login = (token: string, userData: User) => {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        setToken(token);
+        setIsAuthenticated(true);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        router.push('/');
     };
 
     const register = async (nome: string, senha: string) => {
@@ -123,14 +131,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const logout = () => {
-        setToken(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         setUser(null);
+        setToken(null);
+        setIsAuthenticated(false);
         delete api.defaults.headers.common['Authorization'];
         router.push('/login');
     };
 
+    const updateUser = (userData: Partial<User>) => {
+        if (user) {
+            const updatedUser = { ...user, ...userData };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser, isAuthenticated }}>
             {children}
             
             {/* Modal Global de Convite de Batalha */}
@@ -163,12 +182,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             )}
         </AuthContext.Provider>
     );
-};
+}
 
 export function useAuth() {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth deve ser usado dentro de AuthProvider');
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
 } 

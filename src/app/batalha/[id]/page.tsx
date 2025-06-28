@@ -44,9 +44,15 @@ export default function BatalhaPage() {
     const [loadingBg, setLoadingBg] = useState("/assets/gifs/loading.gif");
     const [redirectTimer, setRedirectTimer] = useState(5);
     const [showBattleResult, setShowBattleResult] = useState(false);
+    const [hasSelectedPokemon, setHasSelectedPokemon] = useState(false);
 
     useEffect(() => {
         if (!id || !user) return;
+
+        // Resetar estado de seleção de pokémon
+        setHasSelectedPokemon(false);
+        setAguardandoAdversario(false);
+        setSelectedPokemonId(null);
 
         // Primeiro configurar treinador no store
         setTrainer({ id: user.id, nome: user.nome });
@@ -105,6 +111,7 @@ export default function BatalhaPage() {
         setSelectedPokemonId(pokemonId);
         setShowPokemonSelector(false);
         setAguardandoAdversario(true);
+        setHasSelectedPokemon(true);
         try {
             await api.post(`/batalha/${id}/iniciar`, { pokemonAId: pokemonId });
             // Após selecionar, re-entrar na sala da batalha (caso o socket tenha reconectado)
@@ -113,6 +120,7 @@ export default function BatalhaPage() {
         } catch (error) {
             setError('Erro ao selecionar pokémon');
             setAguardandoAdversario(false);
+            setHasSelectedPokemon(false);
         }
     };
 
@@ -287,7 +295,11 @@ export default function BatalhaPage() {
         );
     }
 
-    if (!battle) {
+    // Mostrar seleção de pokémon se:
+    // 1. Não há batalha ativa OU
+    // 2. Batalha existe mas ainda não começou (status 'waiting') OU
+    // 3. Usuário ainda não selecionou pokémon
+    if (!battle || battle.status === 'waiting' || !hasSelectedPokemon) {
         if (!aguardandoAdversario) {
             // Mostrar seleção de pokémons
             return (
