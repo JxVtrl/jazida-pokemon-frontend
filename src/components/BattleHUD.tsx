@@ -92,9 +92,10 @@ export default function BattleHUD() {
             setSelectedPokemonA(null);
             setSelectedPokemonB(null);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Erro na batalha:', err);
-            setError(err.response?.data?.error || 'Erro ao realizar batalha');
+            const errorMessage = err instanceof Error ? err.message : 'Erro ao realizar batalha';
+            setError(errorMessage);
         } finally {
             setIsBattling(false);
         }
@@ -142,8 +143,8 @@ export default function BattleHUD() {
                                     <Card
                                         key={pokemon.id}
                                         className={`cursor-pointer transition-all hover:scale-105 ${selectedPokemonA?.id === pokemon.id || selectedPokemonB?.id === pokemon.id
-                                                ? 'ring-2 ring-blue-500 bg-blue-50'
-                                                : ''
+                                            ? 'ring-2 ring-blue-500 bg-blue-50'
+                                            : ''
                                             } ${getTypeColor(pokemon.tipo)}`}
                                         onClick={() => {
                                             if (!selectedPokemonA) {
@@ -288,8 +289,8 @@ export default function BattleHUD() {
 
                                     {/* Perdedor */}
                                     <Card className={`border-2 ${battleResult.perdedor.removido
-                                            ? 'border-red-500 bg-red-50'
-                                            : 'border-gray-400 bg-gray-50'
+                                        ? 'border-red-500 bg-red-50'
+                                        : 'border-gray-400 bg-gray-50'
                                         }`}>
                                         <CardContent className="p-4 text-center">
                                             <div className="text-4xl mb-2">
