@@ -30,6 +30,13 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // Recarregar pokémons quando voltar para a aba de lista
+  useEffect(() => {
+    if (activeTab === 'list') {
+      fetchData();
+    }
+  }, [activeTab]);
+
   return (
     <main className="min-h-screen p-4 bg-gray-100">
       {/* Header */}
