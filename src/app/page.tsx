@@ -1,9 +1,6 @@
 "use client";
 
 import PokemonCard from "@/components/PokemonCard";
-import PokemonForm from "@/components/PokemonForm";
-import BattleHUD from "@/components/BattleHUD";
-import TrainerDashboard from "@/components/TrainerDashboard";
 import TrainerList from "@/components/TrainerList";
 import BattleHistory from "@/components/BattleHistory";
 import ProfileTab from "@/components/ProfileTab";
@@ -12,33 +9,14 @@ import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import RequireAuth from "@/components/RequireAuth";
-import { useAuth } from "@/context/AuthContext";
 import { useBattleStore } from "@/store/battleStore";
-
-type Pokemon = {
-  id: number;
-  tipo: string;
-  treinador: string;
-  nivel: number;
-};
-
-interface BattleResult {
-  pokemon: {
-    id: number;
-    tipo: string;
-    treinador: string;
-    nivel: number;
-    nivelAnterior: number;
-  };
-  result: 'victory' | 'defeat' | 'death';
-}
+import type { Pokemon, BattleResult } from "@/types";
 
 export default function Home() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [activeTab, setActiveTab] = useState<'list' | 'battle' | 'challenges' | 'history' | 'profile'>('list');
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
   const [showBattleModal, setShowBattleModal] = useState(false);
-  const { user, logout } = useAuth();
   const { setBattle } = useBattleStore();
 
   async function fetchData() {

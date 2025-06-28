@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import PokemonCard from './PokemonCard';
+import type { User } from "@/types";
 
 interface ProfileData {
   id: number;

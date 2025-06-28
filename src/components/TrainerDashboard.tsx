@@ -3,15 +3,9 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import PokemonCard from "@/components/PokemonCard";
+import type { Pokemon } from "@/types";
 
 const tiposDisponiveis = ["pikachu", "charizard", "mewtwo"];
-
-type Pokemon = {
-    id: number;
-    tipo: string;
-    treinador: string;
-    nivel: number;
-};
 
 export default function TrainerDashboard() {
     const { user } = useAuth();
@@ -26,7 +20,7 @@ export default function TrainerDashboard() {
         try {
             const res = await api.get("/me/pokemons");
             setPokemons(res.data || []);
-        } catch (err: any) {
+        } catch (err: unknown) {
             setError("Erro ao buscar seus pokémons.");
         } finally {
             setLoading(false);
@@ -49,8 +43,8 @@ export default function TrainerDashboard() {
             });
             setNovoTipo(tiposDisponiveis[0]);
             fetchPokemons();
-        } catch (err: any) {
-            setError(err?.response?.data?.error || "Erro ao criar pokémon.");
+        } catch (err: unknown) {
+            setError((err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Erro ao criar pokémon.");
         } finally {
             setLoading(false);
         }

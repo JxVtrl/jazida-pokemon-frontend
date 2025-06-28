@@ -4,6 +4,7 @@ import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useBattleStore } from "@/store/battleStore";
+import type { User } from "@/types";
 
 interface Trainer {
     id: number;

@@ -8,16 +8,7 @@ import { useBattleStore } from "@/store/battleStore";
 import { getPokemonGifByLevel } from "@/utils/getPokemonGifByLevel";
 import PokemonCard from "@/components/PokemonCard";
 import api from "@/lib/api";
-
-interface BattlePokemon {
-    id: number;
-    tipo: string;
-    treinador: string;
-    nivel: number;
-    vida: number;
-    vidaMaxima: number;
-    status: 'ready' | 'attacking' | 'defending' | 'fainted';
-}
+import type { BattlePokemon } from "@/types";
 
 export default function BatalhaPage() {
     const { id } = useParams();

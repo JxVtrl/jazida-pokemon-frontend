@@ -4,12 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import api from '../lib/api';
 import { useRouter } from 'next/navigation';
 import { useBattleStore } from "@/store/battleStore";
-
-interface User {
-    id: number;
-    nome: string;
-    avatar_url?: string;
-}
+import type { User } from "@/types";
 
 interface AuthContextType {
     user: User | null;
@@ -24,12 +19,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+interface BattleInviteData {
+  type: string;
+  challengeId: string;
+  [key: string]: any;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [showBattleInvite, setShowBattleInvite] = useState(false);
-    const [inviteData, setInviteData] = useState<any>(null);
+    const [inviteData, setInviteData] = useState<BattleInviteData | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const router = useRouter();
     const { setTrainer, connectSocket, disconnectSocket, socket } = useBattleStore();
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (!socket || !user) return;
 
-        const handleBattleInvite = (data: any) => {
+        const handleBattleInvite = (data: BattleInviteData) => {
             console.log('🎯 Convite de batalha recebido:', data);
             if (data.type === "challenged") {
                 setInviteData(data);
@@ -94,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setShowBattleInvite(false);
             setInviteData(null);
             // O redirecionamento será feito automaticamente pelo socket
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Erro ao aceitar desafio:', err);
             alert('Erro ao aceitar desafio.');
             setShowBattleInvite(false);

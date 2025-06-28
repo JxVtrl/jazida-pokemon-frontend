@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import type { User } from "@/types";
 
 export default function LoginPage() {
     const { login, loading } = useAuth();
@@ -14,8 +15,8 @@ export default function LoginPage() {
         setError("");
         try {
             await login(nome, senha);
-        } catch (err: any) {
-            setError(err?.response?.data?.error || "Erro ao fazer login.");
+        } catch (err: unknown) {
+            setError((err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Erro ao fazer login.");
         }
     };
 

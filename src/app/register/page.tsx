@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import type { User } from "@/types";
 
 export default function RegisterPage() {
     const { register, loading } = useAuth();
@@ -14,8 +15,8 @@ export default function RegisterPage() {
         setError("");
         try {
             await register(nome, senha);
-        } catch (err: any) {
-            setError(err?.response?.data?.error || "Erro ao registrar.");
+        } catch (err: unknown) {
+            setError((err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Erro ao registrar.");
         }
     };
 

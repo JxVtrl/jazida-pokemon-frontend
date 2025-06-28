@@ -16,11 +16,9 @@ interface BattleResultModalProps {
 
 export default function BattleResultModal({ isOpen, onClose, pokemon, result }: BattleResultModalProps) {
   const [showAnimation, setShowAnimation] = useState(false);
-  const [currentLevel, setCurrentLevel] = useState(pokemon?.nivelAnterior || pokemon?.nivel || 0);
 
   useEffect(() => {
     if (isOpen && pokemon) {
-      setCurrentLevel(pokemon.nivelAnterior || pokemon.nivel);
       setShowAnimation(false);
       
       // Inicia a animação após um breve delay
@@ -150,4 +148,4 @@ export default function BattleResultModal({ isOpen, onClose, pokemon, result }: 
       </div>
     </div>
   );
-} 
+}
