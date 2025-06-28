@@ -128,102 +128,87 @@ export default function TrainerList() {
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">⚔️ Treinadores Online</h2>
-                <button 
-                    onClick={() => {
-                        // Aqui você pode implementar a lógica para atualizar a lista de treinadores
-                        fetchTrainers();
-                    }}
-                    className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {trainers.filter((trainer) => trainer.id !== user?.id).map((trainer) => (
+                <div 
+                    key={trainer.id}
+                    className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-100"
                 >
-                    🔄 Atualizar
-                </button>
-            </div>
-
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {trainers.filter((trainer) => trainer.id !== user?.id).map((trainer) => (
-                    <div 
-                        key={trainer.id}
-                        className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-100"
-                    >
-                        {/* Header do Treinador */}
-                        <div className="flex items-center space-x-4 mb-4">
-                            <div className="relative">
-                                <img
-                                    src={trainer.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${trainer.nome}`}
-                                    alt="Avatar"
-                                    className="w-12 h-12 rounded-full border-2 border-gray-200"
-                                />
-                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="font-bold text-gray-800 text-lg">{trainer.nome}</h3>
-                                <p className="text-sm text-gray-500">
-                                    {trainer.status_message || 'Treinador Pokémon'}
-                                </p>
-                            </div>
+                    {/* Header do Treinador */}
+                    <div className="flex items-center space-x-4 mb-4">
+                        <div className="relative">
+                            <img
+                                src={trainer.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${trainer.nome}`}
+                                alt="Avatar"
+                                className="w-12 h-12 rounded-full border-2 border-gray-200"
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                         </div>
-
-                        {/* 
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Nível</span>
-                                <span className={`font-bold ${getLevelColor(trainer.level)}`}>
-                                    {trainer.level}
-                                </span>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Taxa de Vitória</span>
-                                <span className={`font-bold ${getWinRateColor(trainer.winRate)}`}>
-                                    {trainer.winRate}%
-                                </span>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Total de Batalhas</span>
-                                <span className="font-bold text-gray-800">
-                                    {trainer.total_battles}
-                                </span>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Vitórias</span>
-                                <span className="font-bold text-green-600">
-                                    {trainer.wins}
-                                </span>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Derrotas</span>
-                                <span className="font-bold text-red-600">
-                                    {trainer.losses}
-                                </span>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600">Experiência</span>
-                                <span className="font-bold text-blue-600">
-                                    {trainer.experience}
-                                </span>
-                            </div>
-                        </div> 
-                        */}
-
-                        {/* Botão de Desafio */}
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                            <button
-                                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors font-semibold"
-                                onClick={() => handleDesafiar(trainer.id)}
-                            >
-                                🥊 Desafiar
-                            </button>
+                        <div className="flex-1">
+                            <h3 className="font-bold text-gray-800 text-lg">{trainer.nome}</h3>
+                            <p className="text-sm text-gray-500">
+                                {trainer.status_message || 'Treinador Pokémon'}
+                            </p>
                         </div>
                     </div>
-                ))}
-            </div>
+
+                    {/* 
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Nível</span>
+                            <span className={`font-bold ${getLevelColor(trainer.level)}`}>
+                                {trainer.level}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Taxa de Vitória</span>
+                            <span className={`font-bold ${getWinRateColor(trainer.winRate)}`}>
+                                {trainer.winRate}%
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Total de Batalhas</span>
+                            <span className="font-bold text-gray-800">
+                                {trainer.total_battles}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Vitórias</span>
+                            <span className="font-bold text-green-600">
+                                {trainer.wins}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Derrotas</span>
+                            <span className="font-bold text-red-600">
+                                {trainer.losses}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Experiência</span>
+                            <span className="font-bold text-blue-600">
+                                {trainer.experience}
+                            </span>
+                        </div>
+                    </div> 
+                    */}
+
+                    {/* Botão de Desafio */}
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                        <button
+                            className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors font-semibold"
+                            onClick={() => handleDesafiar(trainer.id)}
+                        >
+                            🥊 Desafiar
+                        </button>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 } 
