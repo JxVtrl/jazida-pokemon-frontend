@@ -40,7 +40,7 @@ export default function BattleHUD() {
     const fetchPokemons = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get('/pokemons');
+            const response = await api.get('/pokemons/public');
             setPokemons(response.data);
             setError(null);
         } catch (err) {

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import PokemonCard from "@/components/PokemonCard";
 
 const tiposDisponiveis = ["pikachu", "charizard", "mewtwo"];
 
@@ -42,7 +43,7 @@ export default function TrainerDashboard() {
         setError("");
         setLoading(true);
         try {
-            await api.post("/api/pokemons", {
+            await api.post("/pokemons", {
                 tipo: novoTipo,
                 treinador: user?.nome,
             });
@@ -56,7 +57,7 @@ export default function TrainerDashboard() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
+        <div className="max-w-6xl mx-auto p-4">
             <h2 className="text-2xl font-bold mb-4 text-center">Seus Pokémons</h2>
             <form onSubmit={handleCreate} className="flex gap-2 mb-6 justify-center">
                 <select
@@ -78,21 +79,12 @@ export default function TrainerDashboard() {
                 </button>
             </form>
             {error && <div className="text-red-600 text-center mb-4">{error}</div>}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8">
                 {pokemons.map(pokemon => (
-                    <div key={pokemon.id} className="bg-white rounded-lg shadow p-4 flex flex-col items-center border border-gray-200">
-                        <div className="text-3xl mb-2">
-                            {pokemon.tipo === "pikachu" && "⚡"}
-                            {pokemon.tipo === "charizard" && "🔥"}
-                            {pokemon.tipo === "mewtwo" && "🧠"}
-                        </div>
-                        <div className="font-bold text-lg capitalize mb-1">{pokemon.tipo}</div>
-                        <div className="text-gray-600 text-sm mb-1">Nível: <span className="font-semibold">{pokemon.nivel}</span></div>
-                        <div className="text-gray-500 text-xs">Treinador: {pokemon.treinador}</div>
-                    </div>
+                    <PokemonCard key={pokemon.id} pokemon={pokemon} />
                 ))}
                 {pokemons.length === 0 && !loading && (
-                    <div className="col-span-2 text-center text-gray-500">Nenhum pokémon encontrado.</div>
+                    <div className="col-span-full text-center text-gray-500">Nenhum pokémon encontrado.</div>
                 )}
             </div>
         </div>

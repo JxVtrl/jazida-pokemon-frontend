@@ -6,6 +6,7 @@ import RequireAuth from "@/components/RequireAuth";
 import { useAuth } from "@/context/AuthContext";
 import { useBattleStore } from "@/store/battleStore";
 import { getPokemonGifByLevel } from "@/utils/getPokemonGifByLevel";
+import PokemonCard from "@/components/PokemonCard";
 import api from "@/lib/api";
 
 interface BattlePokemon {
@@ -41,6 +42,8 @@ export default function BatalhaPage() {
     const [pokemonsLoading, setPokemonsLoading] = useState(false);
     const [aguardandoAdversario, setAguardandoAdversario] = useState(false);
     const [loadingBg, setLoadingBg] = useState("/assets/gifs/loading.gif");
+    const [redirectTimer, setRedirectTimer] = useState(5);
+    const [showBattleResult, setShowBattleResult] = useState(false);
 
     useEffect(() => {
         if (!id || !user) return;
@@ -104,6 +107,8 @@ export default function BatalhaPage() {
         setAguardandoAdversario(true);
         try {
             await api.post(`/batalha/${id}/iniciar`, { pokemonAId: pokemonId });
+            // Após selecionar, re-entrar na sala da batalha (caso o socket tenha reconectado)
+            joinBattle(id as string);
             console.log('Pokémon selecionado e enviado para o backend:', pokemonId);
         } catch (error) {
             setError('Erro ao selecionar pokémon');
@@ -117,6 +122,30 @@ export default function BatalhaPage() {
             setAguardandoAdversario(false);
         }
     }, [battle]);
+
+    // Timer para redirecionamento após batalha finalizada
+    useEffect(() => {
+        if (battle?.status === 'finished') {
+            setRedirectTimer(5);
+            const interval = setInterval(() => {
+                setRedirectTimer((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        window.location.href = '/';
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [battle?.status]);
+
+    useEffect(() => {
+        if (battle?.status === 'finished') {
+            setShowBattleResult(true);
+        }
+    }, [battle?.status]);
 
     const getPokemonImage = (tipo: string) => {
         const images: { [key: string]: string } = {
@@ -170,24 +199,119 @@ export default function BatalhaPage() {
         return () => window.removeEventListener("resize", updateBg);
     }, []);
 
+    // Função para obter nome do treinador pelo ID
+    const getTrainerName = (id: number) => {
+        if (id === user?.id) return user?.nome;
+        // Tenta buscar pelo adversário (oponentPokemon)
+        if (battle && battle.pokemonA && battle.pokemonB) {
+            const opponentPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonB : battle.pokemonA;
+            if (opponentPokemon && opponentPokemon.treinador === id) return opponentPokemon.treinadorNome || 'Adversário';
+        }
+        return 'Treinador';
+    };
+
+    // CORREÇÃO: Determinar qual pokémon é do treinador atual e qual é do adversário
+    // Só definir essas variáveis se battle existir e tiver pokemonA e pokemonB
+    const myPokemon = battle && battle.pokemonA && battle.pokemonB 
+        ? (battle.pokemonA.treinador === user?.id ? battle.pokemonA : battle.pokemonB)
+        : null;
+    const opponentPokemon = battle && battle.pokemonA && battle.pokemonB
+        ? (battle.pokemonA.treinador === user?.id ? battle.pokemonB : battle.pokemonA)
+        : null;
+
+    const handleVoltarHome = () => {
+        // Salvar resultado da batalha no localStorage
+        if (battle && battle.winner && battle.loser && battle.pokemonA && battle.pokemonB) {
+            // Determinar qual pokémon é do treinador atual
+            const myPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonA : battle.pokemonB;
+            const isWinner = battle.winner.id === myPokemon.id;
+            const isLoser = battle.loser.id === myPokemon.id;
+            
+            // Determinar o resultado
+            let result: 'victory' | 'defeat' | 'death';
+            if (isWinner) {
+                result = 'victory';
+            } else if (isLoser && battle.loser.nivel <= 0) {
+                result = 'death';
+            } else {
+                result = 'defeat';
+            }
+
+            // Calcular nível anterior (reverter a mudança da batalha)
+            let nivelAnterior = myPokemon.nivel;
+            if (isWinner) {
+                nivelAnterior = Math.max(1, myPokemon.nivel - 1); // Ganhou: nível anterior era menor
+            } else if (isLoser) {
+                if (result === 'death') {
+                    nivelAnterior = Math.max(1, myPokemon.nivel); // Morreu: nível anterior era o atual ou 1
+                } else {
+                    nivelAnterior = myPokemon.nivel + 1; // Perdeu: nível anterior era maior
+                }
+            }
+
+            // Salvar dados da batalha
+            const battleResult = {
+                pokemon: {
+                    ...myPokemon,
+                    nivelAnterior
+                },
+                result
+            };
+
+            localStorage.setItem('battleResult', JSON.stringify(battleResult));
+        }
+
+        leaveBattle();
+        window.location.href = '/';
+    };
+
     // --- NOVA INTERFACE VISUAL CLÁSSICA POKÉMON ---
+    if (showBattleResult && battle?.status === 'finished' && battle.winner && battle.loser) {
+        return (
+            <RequireAuth>
+                <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900 p-4">
+                    <div className="w-full max-w-2xl mx-auto bg-white/90 rounded-xl shadow-lg p-8 text-xl font-mono text-gray-800 text-center">
+                        <div className="mb-4">
+                            <span className="font-bold text-green-700 text-2xl mr-2">
+                                {getTrainerName(battle.winner.treinador)} ({battle.winner.tipo})
+                            </span>
+                            venceu!
+                            <span className="ml-4 text-gray-500 text-lg">
+                                ({getTrainerName(battle.loser.treinador)} - {battle.loser.tipo} perdeu)
+                            </span>
+                        </div>
+                        <div className="text-gray-600 text-sm mb-2">Redirecionando para a Home em {redirectTimer}...</div>
+                    </div>
+                </div>
+            </RequireAuth>
+        );
+    }
+
     if (!battle) {
         if (!aguardandoAdversario) {
             // Mostrar seleção de pokémons
             return (
                 <RequireAuth>
-                    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900">
-                        <div className="w-full max-w-2xl mx-auto mt-16 bg-black/40 rounded-xl p-8">
-                            <h2 className="text-2xl font-bold text-white mb-6">Selecione seu Pokémon</h2>
-                            {myPokemons.map((pokemon) => (
-                                <button
-                                    key={pokemon.id}
-                                    onClick={() => handlePokemonSelect(pokemon.id)}
-                                    className="bg-white/20 backdrop-blur-sm rounded-xl p-4 hover:bg-white/30 transition-all transform hover:scale-105 text-white font-semibold text-lg"
-                                >
-                                    {pokemon.tipo}
-                                </button>
-                            ))}
+                    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900 p-4">
+                        <div className="w-full max-w-4xl mx-auto mt-16 bg-black/40 rounded-xl p-8">
+                            <h2 className="text-2xl font-bold text-white mb-6 text-center">Selecione seu Pokémon</h2>
+                            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                {myPokemons.map((pokemon) => (
+                                    <div
+                                        key={pokemon.id}
+                                        onClick={() => handlePokemonSelect(pokemon.id)}
+                                        className="cursor-pointer transform hover:scale-105 transition-all duration-200 hover:shadow-2xl"
+                                    >
+                                        <PokemonCard pokemon={pokemon} />
+                                    </div>
+                                ))}
+                            </div>
+                            {myPokemons.length === 0 && (
+                                <div className="text-center text-white mt-8">
+                                    <p className="text-lg">Você não tem pokémons para batalhar.</p>
+                                    <p className="text-sm opacity-80">Crie pokémons no seu dashboard primeiro.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </RequireAuth>
@@ -207,6 +331,28 @@ export default function BatalhaPage() {
         }
     }
 
+    // --- PROTEÇÃO CONTRA BATTLE NULO OU INCOMPLETO ---
+    if (!battle || !battle.pokemonA || !battle.pokemonB) {
+        return (
+            <RequireAuth>
+                <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-red-900">
+                    <div className="text-white text-xl text-center max-w-lg">
+                        Ocorreu um erro ao carregar a batalha.<br />
+                        Tente novamente ou volte para a Home.
+                        <div className="mt-6">
+                            <button
+                                onClick={() => window.location.href = '/'}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg"
+                            >
+                                🏠 Voltar para Home
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </RequireAuth>
+        );
+    }
+
     // Só executa daqui pra frente se battle existe
     // Caixa de mensagem
     let message = '';
@@ -219,52 +365,6 @@ export default function BatalhaPage() {
     } else {
         message = 'Aguardando ação dos treinadores...';
     }
-
-    // CORREÇÃO: Determinar qual pokémon é do treinador atual e qual é do adversário
-    const myPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonA : battle.pokemonB;
-    const opponentPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonB : battle.pokemonA;
-
-    const handleVoltarHome = () => {
-        // Salvar resultado da batalha no localStorage
-        if (battle && battle.winner && battle.loser) {
-            // Determinar qual pokémon é do treinador atual
-            const myPokemon = battle.pokemonA.treinador === user?.id ? battle.pokemonA : battle.pokemonB;
-            const isWinner = battle.winner.id === myPokemon.id;
-            const isLoser = battle.loser.id === myPokemon.id;
-            
-            // Determinar o resultado
-            let result: 'victory' | 'defeat' | 'death';
-            if (isWinner) {
-                result = 'victory';
-            } else if (isLoser && battle.loser.nivel <= 0) {
-                result = 'death';
-            } else {
-                result = 'defeat';
-            }
-
-            // Calcular nível anterior (reverter a mudança da batalha)
-            let nivelAnterior = myPokemon.nivel;
-            if (isWinner) {
-                nivelAnterior = myPokemon.nivel - 1; // Vencedor ganhou +1, então anterior = atual - 1
-            } else if (isLoser) {
-                nivelAnterior = myPokemon.nivel + 1; // Perdedor perdeu -1, então anterior = atual + 1
-            }
-
-            // Salvar dados da batalha
-            const battleResult = {
-                pokemon: {
-                    ...myPokemon,
-                    nivelAnterior
-                },
-                result
-            };
-
-            localStorage.setItem('battleResult', JSON.stringify(battleResult));
-        }
-
-        leaveBattle();
-        window.location.href = '/';
-    };
 
     return (
         <RequireAuth>
@@ -281,50 +381,50 @@ export default function BatalhaPage() {
                 {/* Status dos pokémons */}
                 <div className="w-full max-w-2xl mx-auto flex flex-col gap-8 mt-8">
                     {/* Oponente (Topo) */}
-                    {battle.pokemonB && (
+                    {opponentPokemon && (
                         <div className="flex flex-col items-end">
                             <div className="bg-white/80 rounded-lg shadow-lg px-4 py-2 w-72 mb-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="font-bold text-gray-800 text-lg">{battle.pokemonB.tipo}</span>
-                                    <span className="text-gray-700 font-mono">Lv{battle.pokemonB.nivel}</span>
+                                    <span className="font-bold text-gray-800 text-lg">{opponentPokemon.tipo}</span>
+                                    <span className="text-gray-700 font-mono">Lv{opponentPokemon.nivel}</span>
                                 </div>
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className="text-xs text-gray-600">HP</span>
                                     <div className="flex-1 h-3 bg-gray-300 rounded-full overflow-hidden">
-                                        <div className={`h-3 transition-all duration-500 ${getHealthBarColor(battle.pokemonB.vida, battle.pokemonB.vidaMaxima)}`} style={{ width: `${(battle.pokemonB.vida / battle.pokemonB.vidaMaxima) * 100}%` }}></div>
+                                        <div className={`h-3 transition-all duration-500 ${getHealthBarColor(opponentPokemon.vida, opponentPokemon.vidaMaxima)}`} style={{ width: `${(opponentPokemon.vida / opponentPokemon.vidaMaxima) * 100}%` }}></div>
                                     </div>
-                                    <span className="text-xs text-gray-700 ml-2">{battle.pokemonB.vida}/{battle.pokemonB.vidaMaxima}</span>
+                                    <span className="text-xs text-gray-700 ml-2">{opponentPokemon.vida}/{opponentPokemon.vidaMaxima}</span>
                                 </div>
                             </div>
                             {/* Sprite do oponente (frente) */}
                             <div className="-mb-8 mt-2 flex justify-end w-full">
                                 <div className={`${battle.status === 'fighting' ? 'animate-pulse' : ''}`}>
-                                    {getSprite(battle.pokemonB.tipo, battle.pokemonB.nivel, false)}
+                                    {getSprite(opponentPokemon.tipo, opponentPokemon.nivel, false)}
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {/* Player (Baixo) */}
-                    {battle.pokemonA && (
+                    {myPokemon && (
                         <div className="flex flex-col items-start mt-24">
                             {/* Sprite do player (costas) */}
                             <div className="-mb-8 flex justify-start w-full">
                                 <div className={`${battle.status === 'fighting' ? 'animate-pulse' : ''}`}>
-                                    {getSprite(battle.pokemonA.tipo, battle.pokemonA.nivel, true)}
+                                    {getSprite(myPokemon.tipo, myPokemon.nivel, true)}
                                 </div>
                             </div>
                             <div className="bg-white/80 rounded-lg shadow-lg px-4 py-2 w-72 mt-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="font-bold text-gray-800 text-lg">{battle.pokemonA.tipo}</span>
-                                    <span className="text-gray-700 font-mono">Lv{battle.pokemonA.nivel}</span>
+                                    <span className="font-bold text-gray-800 text-lg">{myPokemon.tipo}</span>
+                                    <span className="text-gray-700 font-mono">Lv{myPokemon.nivel}</span>
                                 </div>
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className="text-xs text-gray-600">HP</span>
                                     <div className="flex-1 h-3 bg-gray-300 rounded-full overflow-hidden">
-                                        <div className={`h-3 transition-all duration-500 ${getHealthBarColor(battle.pokemonA.vida, battle.pokemonA.vidaMaxima)}`} style={{ width: `${(battle.pokemonA.vida / battle.pokemonA.vidaMaxima) * 100}%` }}></div>
+                                        <div className={`h-3 transition-all duration-500 ${getHealthBarColor(myPokemon.vida, myPokemon.vidaMaxima)}`} style={{ width: `${(myPokemon.vida / myPokemon.vidaMaxima) * 100}%` }}></div>
                                     </div>
-                                    <span className="text-xs text-gray-700 ml-2">{battle.pokemonA.vida}/{battle.pokemonA.vidaMaxima}</span>
+                                    <span className="text-xs text-gray-700 ml-2">{myPokemon.vida}/{myPokemon.vidaMaxima}</span>
                                 </div>
                             </div>
                         </div>
@@ -337,16 +437,15 @@ export default function BatalhaPage() {
                         {battle.status === 'finished' && battle.winner && battle.loser ? (
                             <div className="text-center">
                                 <div className="mb-4">
-                                    <span className="font-bold text-green-700 text-2xl mr-2">{battle.winner.treinador || battle.winner.tipo}</span>
+                                    <span className="font-bold text-green-700 text-2xl mr-2">
+                                        {getTrainerName(battle.winner.treinador)} ({battle.winner.tipo})
+                                    </span>
                                     venceu!
-                                    <span className="ml-4 text-gray-500 text-lg">({battle.loser.treinador || battle.loser.tipo} perdeu)</span>
+                                    <span className="ml-4 text-gray-500 text-lg">
+                                        ({getTrainerName(battle.loser.treinador)} - {battle.loser.tipo} perdeu)
+                                    </span>
                                 </div>
-                                <button
-                                    onClick={handleVoltarHome}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg"
-                                >
-                                    🏠 Voltar para Home
-                                </button>
+                                <div className="text-gray-600 text-sm mb-2">Redirecionando para a Home em {redirectTimer}...</div>
                             </div>
                         ) : (
                             <span>{message}</span>

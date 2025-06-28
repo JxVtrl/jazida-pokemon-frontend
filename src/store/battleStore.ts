@@ -190,7 +190,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                     }
                 });
 
-                // Determinar qual pokémon é do treinador atual
+                // CORREÇÃO: Determinar qual pokémon é do treinador atual
+                // pokemonA sempre é do primeiro treinador, pokemonB do segundo
                 const myPokemon = battle.pokemonA.treinador === trainer?.id ? battle.pokemonA : battle.pokemonB;
                 const isWinner = data.winner.id === myPokemon.id;
                 const isLoser = data.loser.id === myPokemon.id;

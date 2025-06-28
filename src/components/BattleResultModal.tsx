@@ -91,13 +91,13 @@ export default function BattleResultModal({ isOpen, onClose, pokemon, result }: 
           
           {/* Level Animation */}
           <div className="flex items-center justify-center gap-4">
-            {pokemon.nivelAnterior && (
+            {pokemon.nivelAnterior !== undefined && (
               <span className="text-gray-500 text-lg">
                 Lv.{pokemon.nivelAnterior}
               </span>
             )}
             
-            {pokemon.nivelAnterior && (
+            {pokemon.nivelAnterior !== undefined && (
               <span className="text-2xl font-bold text-blue-600 animate-pulse">
                 →
               </span>
@@ -105,9 +105,9 @@ export default function BattleResultModal({ isOpen, onClose, pokemon, result }: 
             
             <div className="relative">
               <span className={`text-2xl font-bold transition-all duration-1000 ${
-                showAnimation ? 'text-green-600 scale-110' : 'text-gray-800'
+                showAnimation ? (pokemon.nivel > (pokemon.nivelAnterior ?? 0) ? 'text-green-600 scale-110' : (pokemon.nivel < (pokemon.nivelAnterior ?? 0) ? 'text-red-600 scale-110' : 'text-gray-800')) : 'text-gray-800'
               }`}>
-                Lv.{currentLevel}
+                Lv.{pokemon.nivel}
               </span>
               
               {/* Level Change Indicator */}

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import RequireAuth from "@/components/RequireAuth";
 import { useAuth } from "@/context/AuthContext";
+import { useBattleStore } from "@/store/battleStore";
 
 type Pokemon = {
   id: number;
@@ -36,11 +37,12 @@ export default function Home() {
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
   const [showBattleModal, setShowBattleModal] = useState(false);
   const { user, logout } = useAuth();
+  const { setBattle } = useBattleStore();
 
   async function fetchData() {
     try {
       console.log('🔄 Iniciando busca de pokémons...');
-      const response = await api.get("/pokemons");
+      const response = await api.get("/pokemons/public");
       console.log('✅ Pokémons recebidos:', response.data);
       setPokemons(response.data);
     } catch (error) {
@@ -53,6 +55,11 @@ export default function Home() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Limpa o estado da batalha ao entrar na home
+    setBattle(null);
+  }, [setBattle]);
 
   // Verificar se há resultado de batalha no localStorage
   useEffect(() => {
