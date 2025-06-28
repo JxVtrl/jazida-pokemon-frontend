@@ -16,6 +16,7 @@ type Pokemon = {
 export default function Home() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [activeTab, setActiveTab] = useState<'list' | 'battle'>('list');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   async function fetchData() {
     try {
@@ -72,8 +73,33 @@ export default function Home() {
 
       {/* Content */}
       {activeTab === 'list' ? (
-        <div className="max-w-6xl mx-auto">
-          <PokemonForm onCreated={fetchData} />
+        <div className="max-w-6xl mx-auto relative">
+          {/* Botão flutuante para abrir drawer */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full shadow-lg"
+          >
+            + Adicionar Pokémon
+          </button>
+          {/* Drawer do formulário */}
+          <div className={`fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-2xl transition-transform duration-300 ${drawerOpen ? 'translate-y-0' : 'translate-y-full'} max-h-[60vh] overflow-y-auto rounded-t-2xl`}
+            style={{ minHeight: '220px' }}
+          >
+            <div className="flex justify-between items-center px-6 pt-4 pb-2">
+              <h3 className="text-lg font-bold">Adicionar novo Pokémon</h3>
+              <button className="text-gray-500 hover:text-gray-800" onClick={() => setDrawerOpen(false)}>Fechar</button>
+            </div>
+            <div className="px-6 pb-6">
+              <PokemonForm onCreated={() => { fetchData(); setDrawerOpen(false); }} />
+            </div>
+          </div>
+          {/* Overlay para fechar o drawer ao clicar fora */}
+          {drawerOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-30 z-40"
+              onClick={() => setDrawerOpen(false)}
+            />
+          )}
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8">
             {pokemons.map((pokemon) => (
               <PokemonCard key={pokemon.id} pokemon={pokemon} />

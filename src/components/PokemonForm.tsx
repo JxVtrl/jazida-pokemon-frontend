@@ -40,11 +40,24 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
         <Card className="w-full max-w-md mx-auto mb-6">
             <CardContent className="p-4">
                 <form onSubmit={handleSubmit} className="space-y-3">
-                    <Input
-                        placeholder="Tipo (pikachu, charizard, mewtwo)"
-                        value={tipo}
-                        onChange={(e) => setTipo(e.target.value)}
-                    />
+                    <div className="flex justify-center gap-4 mb-2">
+                        {tiposValidos.map((t) => (
+                            <button
+                                type="button"
+                                key={t}
+                                onClick={() => setTipo(t)}
+                                className={`border-2 rounded-lg p-2 transition-all focus:outline-none ${tipo === t ? 'border-blue-600 ring-2 ring-blue-300' : 'border-gray-300 hover:border-blue-400'}`}
+                                aria-label={t}
+                            >
+                                <img
+                                    src={`/8bit/${t}.webp`}
+                                    alt={t}
+                                    className="w-12 h-12 mx-auto"
+                                />
+                                <span className="block text-xs mt-1 capitalize font-semibold text-gray-700">{t}</span>
+                            </button>
+                        ))}
+                    </div>
                     <Input
                         placeholder="Nome do Treinador"
                         value={treinador}

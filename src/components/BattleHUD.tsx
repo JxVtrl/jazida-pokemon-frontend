@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import api from '@/lib/api';
+import PokemonCard from "@/components/PokemonCard";
 
 type Pokemon = {
     id: number;
@@ -31,6 +32,7 @@ export default function BattleHUD() {
     const [isBattling, setIsBattling] = useState(false);
     const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     // Buscar lista de pokémons
     useEffect(() => {
@@ -120,7 +122,7 @@ export default function BattleHUD() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="max-w-4xl mx-auto p-6 space-y-6 relative">
             <Card>
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
@@ -128,127 +130,132 @@ export default function BattleHUD() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {/* Lista de Pokémons */}
-                    <div className="mb-6">
-                        <h3 className="text-lg font-semibold mb-4">Selecione dois pokémons para batalhar:</h3>
-
-                        {isLoading ? (
-                            <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                <p className="mt-2">Carregando pokémons...</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {pokemons.map((pokemon) => (
-                                    <Card
-                                        key={pokemon.id}
-                                        className={`cursor-pointer transition-all hover:scale-105 ${selectedPokemonA?.id === pokemon.id || selectedPokemonB?.id === pokemon.id
-                                            ? 'ring-2 ring-blue-500 bg-blue-50'
-                                            : ''
-                                            } ${getTypeColor(pokemon.tipo)}`}
-                                        onClick={() => {
-                                            if (!selectedPokemonA) {
-                                                handlePokemonSelect(pokemon, true);
-                                            } else if (!selectedPokemonB && selectedPokemonA.id !== pokemon.id) {
-                                                handlePokemonSelect(pokemon, false);
-                                            }
-                                        }}
-                                    >
-                                        <CardContent className="p-4 text-center">
-                                            <div className="text-4xl mb-2">{getPokemonImage(pokemon.tipo)}</div>
-                                            <h4 className="font-bold capitalize text-lg">{pokemon.tipo}</h4>
-                                            <p className="text-sm text-gray-600">Treinador: {pokemon.treinador}</p>
-                                            <p className="text-sm font-semibold">Nível: {pokemon.nivel}</p>
-                                            <p className="text-xs text-gray-500">ID: {pokemon.id}</p>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Seleção de Pokémons */}
+                    {/* Pokémons Selecionados no topo */}
                     {(selectedPokemonA || selectedPokemonB) && (
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold mb-4">Pokémons Selecionados:</h3>
-                            <div className="flex flex-col md:flex-row gap-4 justify-center">
+                        <div className="mb-8 flex flex-col items-center">
+                            <h3 className="text-lg font-semibold mb-4">Pokémons para Batalha:</h3>
+                            <div className="flex flex-row gap-8 justify-center items-center">
                                 {selectedPokemonA && (
-                                    <Card className={`${getTypeColor(selectedPokemonA.tipo)} border-2 border-blue-500`}>
-                                        <CardContent className="p-4 text-center">
-                                            <div className="text-3xl mb-2">{getPokemonImage(selectedPokemonA.tipo)}</div>
-                                            <h4 className="font-bold capitalize">{selectedPokemonA.tipo}</h4>
-                                            <p className="text-sm">Nível: {selectedPokemonA.nivel}</p>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setSelectedPokemonA(null)}
-                                                className="mt-2"
-                                            >
-                                                Remover
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
+                                    <div className="relative">
+                                        <PokemonCard pokemon={selectedPokemonA} />
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setSelectedPokemonA(null)}
+                                            className="absolute top-2 right-2 z-10"
+                                        >
+                                            Remover
+                                        </Button>
+                                    </div>
                                 )}
-
-                                <div className="flex items-center justify-center text-2xl font-bold text-gray-400">
+                                <div className="flex items-center justify-center text-3xl font-bold text-gray-400 select-none">
                                     VS
                                 </div>
-
                                 {selectedPokemonB && (
-                                    <Card className={`${getTypeColor(selectedPokemonB.tipo)} border-2 border-red-500`}>
-                                        <CardContent className="p-4 text-center">
-                                            <div className="text-3xl mb-2">{getPokemonImage(selectedPokemonB.tipo)}</div>
-                                            <h4 className="font-bold capitalize">{selectedPokemonB.tipo}</h4>
-                                            <p className="text-sm">Nível: {selectedPokemonB.nivel}</p>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setSelectedPokemonB(null)}
-                                                className="mt-2"
-                                            >
-                                                Remover
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
+                                    <div className="relative">
+                                        <PokemonCard pokemon={selectedPokemonB} />
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setSelectedPokemonB(null)}
+                                            className="absolute top-2 right-2 z-10"
+                                        >
+                                            Remover
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
+                            {/* Botão de Batalha */}
+                            {selectedPokemonA && selectedPokemonB && (
+                                <div className="text-center mt-6">
+                                    <Button
+                                        onClick={handleBattle}
+                                        disabled={isBattling}
+                                        size="lg"
+                                        className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg"
+                                    >
+                                        {isBattling ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                                Batalhando...
+                                            </>
+                                        ) : (
+                                            '⚔️ Batalhar!'
+                                        )}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     )}
 
-                    {/* Botão de Batalha */}
-                    {selectedPokemonA && selectedPokemonB && (
-                        <div className="text-center mb-6">
-                            <Button
-                                onClick={handleBattle}
-                                disabled={isBattling}
-                                size="lg"
-                                className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg"
-                            >
-                                {isBattling ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                        Batalhando...
-                                    </>
-                                ) : (
-                                    '⚔️ Batalhar!'
-                                )}
-                            </Button>
+                    {/* Drawer de seleção de pokémons */}
+                    <div>
+                        <Button
+                            onClick={() => setDrawerOpen(true)}
+                            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg"
+                        >
+                            Selecionar Pokémons
+                        </Button>
+                        {/* Drawer */}
+                        <div className={`fixed left-0 right-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-2xl transition-transform duration-300 ${drawerOpen ? 'translate-y-0' : 'translate-y-full'} max-h-[70vh] overflow-y-auto rounded-t-2xl`}
+                            style={{ minHeight: '300px' }}
+                        >
+                            <div className="flex justify-between items-center px-6 pt-4 pb-2">
+                                <h3 className="text-lg font-bold">Selecione dois pokémons para batalhar</h3>
+                                <Button variant="ghost" onClick={() => setDrawerOpen(false)}>
+                                    Fechar
+                                </Button>
+                            </div>
+                            {isLoading ? (
+                                <div className="text-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                                    <p className="mt-2">Carregando pokémons...</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-6 pb-6">
+                                    {pokemons.map((pokemon) => (
+                                        <div
+                                            key={pokemon.id}
+                                            className={`cursor-pointer transition-all hover:scale-105 ${selectedPokemonA?.id === pokemon.id || selectedPokemonB?.id === pokemon.id
+                                                ? 'ring-2 ring-blue-500 bg-blue-50'
+                                                : ''
+                                                }`}
+                                            onClick={() => {
+                                                if (!selectedPokemonA) {
+                                                    handlePokemonSelect(pokemon, true);
+                                                } else if (!selectedPokemonB && selectedPokemonA.id !== pokemon.id) {
+                                                    handlePokemonSelect(pokemon, false);
+                                                }
+                                            }}
+                                        >
+                                            <PokemonCard pokemon={pokemon} />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    )}
+                        {/* Overlay para fechar o drawer ao clicar fora */}
+                        {drawerOpen && (
+                            <div
+                                className="fixed inset-0 bg-black bg-opacity-30 z-40"
+                                onClick={() => setDrawerOpen(false)}
+                            />
+                        )}
+                    </div>
 
                     {/* Animação de Batalha */}
                     {isBattling && (
                         <div className="text-center py-8">
                             <div className="flex justify-center items-center space-x-8 mb-4">
                                 <div className="text-center">
-                                    <div className="text-4xl mb-2">{getPokemonImage(selectedPokemonA?.tipo || '')}</div>
+                                    <div className="text-4xl mb-2">{selectedPokemonA && <PokemonCard pokemon={selectedPokemonA} />}</div>
                                     <div className="w-32 bg-gray-200 rounded-full h-2">
                                         <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
                                     </div>
                                 </div>
                                 <div className="text-2xl animate-bounce">⚔️</div>
                                 <div className="text-center">
-                                    <div className="text-4xl mb-2">{getPokemonImage(selectedPokemonB?.tipo || '')}</div>
+                                    <div className="text-4xl mb-2">{selectedPokemonB && <PokemonCard pokemon={selectedPokemonB} />}</div>
                                     <div className="w-32 bg-gray-200 rounded-full h-2">
                                         <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{ width: '40%' }}></div>
                                     </div>
