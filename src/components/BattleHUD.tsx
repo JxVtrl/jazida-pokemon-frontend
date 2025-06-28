@@ -16,12 +16,6 @@ type Pokemon = {
 type BattleResult = {
     vencedor: Pokemon & { nivel: number };
     perdedor: Pokemon & { nivel: number; removido?: boolean };
-    batalha: {
-        vencedor: string;
-        perdedor: string;
-        probabilidadeVencedor: number;
-        probabilidadePerdedor: number;
-    };
 };
 
 export default function BattleHUD() {
@@ -295,9 +289,6 @@ export default function BattleHUD() {
                                             <p className="text-lg font-bold text-green-600">
                                                 Novo Nível: {battleResult.vencedor.nivel} ⬆️
                                             </p>
-                                            <p className="text-xs text-gray-600">
-                                                Probabilidade: {(battleResult.batalha.probabilidadeVencedor * 100).toFixed(1)}%
-                                            </p>
                                         </CardContent>
                                     </Card>
 
@@ -322,9 +313,6 @@ export default function BattleHUD() {
                                                 ) : (
                                                     `Novo Nível: ${battleResult.perdedor.nivel} ⬇️`
                                                 )}
-                                            </p>
-                                            <p className="text-xs text-gray-600">
-                                                Probabilidade: {(battleResult.batalha.probabilidadePerdedor * 100).toFixed(1)}%
                                             </p>
                                         </CardContent>
                                     </Card>

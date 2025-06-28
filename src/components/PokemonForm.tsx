@@ -11,7 +11,6 @@ const tiposValidos = ["pikachu", "charizard", "mewtwo"];
 export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
     const [tipo, setTipo] = useState("");
     const [treinador, setTreinador] = useState("");
-    const [nivel, setNivel] = useState(1);
     const [erro, setErro] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -33,12 +32,10 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
             setIsLoading(true);
             await api.post("/pokemons", {
                 tipo: tipo.toLowerCase(),
-                treinador: treinador.trim(),
-                nivel: nivel
+                treinador: treinador.trim()
             });
             setTipo("");
             setTreinador("");
-            setNivel(1);
             setErro("");
             setIsLoading(false);
             if (onCreated) onCreated();
@@ -81,25 +78,6 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
                             placeholder="Nome do Treinador"
                             value={treinador}
                             onChange={(e) => setTreinador(e.target.value)}
-                            disabled={isLoading}
-                        />
-                    </div>
-                    
-                    <div>
-                        <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-1">
-                            Nível
-                        </label>
-                        <Input
-                            id="nivel"
-                            type="number"
-                            min="1"
-                            max="100"
-                            value={nivel}
-                            onChange={(e) => {
-                                const val = e.target.valueAsNumber;
-                                if (isNaN(val) || val < 1) setNivel(1);
-                                else setNivel(val);
-                            }}
                             disabled={isLoading}
                         />
                     </div>

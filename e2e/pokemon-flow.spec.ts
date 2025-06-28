@@ -14,7 +14,6 @@ test.describe('Fluxo completo da aplicação', () => {
         // Preencher formulário
         await page.getByLabel('mewtwo').click();
         await page.getByLabel(/treinador/i).fill('E2E Test');
-        await page.getByLabel(/nível/i).fill('15');
 
         // Submeter
         await page.getByRole('button', { name: /criar pokémon/i }).click();
