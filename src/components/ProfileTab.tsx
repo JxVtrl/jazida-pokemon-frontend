@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/api';
-import PokemonCard from './PokemonCard';
-import type { User } from "@/types";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/api";
+import PokemonCard from "./PokemonCard";
+import Image from "next/image";
 
 interface ProfileData {
   id: number;
@@ -27,21 +27,21 @@ interface Pokemon {
 }
 
 export default function ProfileTab() {
-  const { user, updateUser } = useAuth();
+  const { updateUser } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
-    nome: '',
-    status_message: ''
+    nome: "",
+    status_message: "",
   });
-  const [novoTipo, setNovoTipo] = useState('pikachu');
+  const [novoTipo, setNovoTipo] = useState("pikachu");
   const [criandoPokemon, setCriandoPokemon] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const tiposDisponiveis = ['pikachu', 'charizard', 'mewtwo'];
+  const tiposDisponiveis = ["pikachu", "charizard", "mewtwo"];
 
   useEffect(() => {
     fetchProfile();
@@ -51,14 +51,14 @@ export default function ProfileTab() {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/profile');
+      const response = await api.get("/profile");
       setProfile(response.data);
       setFormData({
         nome: response.data.nome,
-        status_message: response.data.status_message || ''
+        status_message: response.data.status_message || "",
       });
     } catch (error) {
-      console.error('Erro ao buscar perfil:', error);
+      console.error("Erro ao buscar perfil:", error);
     } finally {
       setLoading(false);
     }
@@ -66,39 +66,44 @@ export default function ProfileTab() {
 
   const fetchPokemons = async () => {
     try {
-      const response = await api.get('/me/pokemons');
+      const response = await api.get("/me/pokemons");
       setPokemons(response.data);
     } catch (error) {
-      console.error('Erro ao buscar pokémons:', error);
+      console.error("Erro ao buscar pokémons:", error);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
-      const response = await api.put('/profile', formData);
-      
+      const response = await api.put("/profile", formData);
+
       // Atualizar dados do usuário no contexto
       if (response.data.trainer) {
         updateUser(response.data.trainer);
       }
-      
+
       setProfile(response.data.trainer);
       setEditMode(false);
-      
+
       // Mostrar mensagem de sucesso
-      alert('Perfil atualizado com sucesso!');
-    } catch (error: any) {
-      console.error('Erro ao atualizar perfil:', error);
-      alert(error.response?.data?.error || 'Erro ao atualizar perfil');
+      alert("Perfil atualizado com sucesso!");
+    } catch (error: unknown) {
+      console.error("Erro ao atualizar perfil:", error);
+      const errorMessage =
+        (error as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || "Erro ao atualizar perfil";
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -109,45 +114,49 @@ export default function ProfileTab() {
     if (!file) return;
 
     // Validações
-    if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione apenas arquivos de imagem.');
+    if (!file.type.startsWith("image/")) {
+      alert("Por favor, selecione apenas arquivos de imagem.");
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB
-      alert('A imagem deve ter no máximo 5MB.');
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB
+      alert("A imagem deve ter no máximo 5MB.");
       return;
     }
 
     try {
       setUploading(true);
-      
-      const formData = new FormData();
-      formData.append('avatar', file);
 
-      const response = await api.post('/profile/avatar', formData, {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const response = await api.post("/profile/avatar", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       // Atualizar dados do usuário no contexto
       if (response.data.trainer) {
         updateUser(response.data.trainer);
       }
-      
+
       setProfile(response.data.trainer);
-      
+
       // Mostrar mensagem de sucesso
-      alert('Avatar atualizado com sucesso!');
-      
+      alert("Avatar atualizado com sucesso!");
+
       // Limpar input
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
-    } catch (error: any) {
-      console.error('Erro ao fazer upload do avatar:', error);
-      alert(error.response?.data?.error || 'Erro ao fazer upload do avatar');
+    } catch (error: unknown) {
+      console.error("Erro ao fazer upload do avatar:", error);
+      const errorMessage =
+        (error as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || "Erro ao fazer upload do avatar";
+      alert(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -159,12 +168,15 @@ export default function ProfileTab() {
 
     try {
       setCriandoPokemon(true);
-      await api.post('/pokemons', { tipo: novoTipo });
+      await api.post("/pokemons", { tipo: novoTipo });
       await fetchPokemons(); // Recarregar lista
-      setNovoTipo('pikachu');
-    } catch (error: any) {
-      console.error('Erro ao criar pokémon:', error);
-      alert(error.response?.data?.error || 'Erro ao criar pokémon');
+      setNovoTipo("pikachu");
+    } catch (error: unknown) {
+      console.error("Erro ao criar pokémon:", error);
+      const errorMessage =
+        (error as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || "Erro ao criar pokémon";
+      alert(errorMessage);
     } finally {
       setCriandoPokemon(false);
     }
@@ -189,14 +201,19 @@ export default function ProfileTab() {
         <div className="space-y-8">
           {/* Seção do Perfil */}
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">👤 Meu Perfil</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              👤 Meu Perfil
+            </h2>
+
             <div className="grid md:grid-cols-3 gap-6">
               {/* Avatar Section */}
               <div className="text-center">
                 <div className="relative inline-block">
-                  <img
-                    src={profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.nome}`}
+                  <Image
+                    src={
+                      profile.avatar_url ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.nome}`
+                    }
                     alt="Avatar"
                     className="w-32 h-32 rounded-full border-4 border-gray-200 mx-auto"
                   />
@@ -264,7 +281,7 @@ export default function ProfileTab() {
                         disabled={loading}
                         className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:opacity-50"
                       >
-                        {loading ? 'Salvando...' : 'Salvar'}
+                        {loading ? "Salvando..." : "Salvar"}
                       </button>
                       <button
                         onClick={() => setEditMode(false)}
@@ -287,7 +304,9 @@ export default function ProfileTab() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Status
                       </label>
-                      <p className="text-gray-900">{profile.status_message || 'Nenhuma mensagem de status'}</p>
+                      <p className="text-gray-900">
+                        {profile.status_message || "Nenhuma mensagem de status"}
+                      </p>
                     </div>
                     <button
                       onClick={() => setEditMode(true)}
@@ -302,22 +321,32 @@ export default function ProfileTab() {
 
             {/* Statistics */}
             <div className="border-t pt-6 mt-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">📊 Estatísticas</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                📊 Estatísticas
+              </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">{profile.level}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {profile.level}
+                  </p>
                   <p className="text-sm text-gray-600">Nível</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{profile.winRate}%</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {profile.winRate}%
+                  </p>
                   <p className="text-sm text-gray-600">Taxa de Vitória</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-purple-600">{profile.total_battles}</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {profile.total_battles}
+                  </p>
                   <p className="text-sm text-gray-600">Total de Batalhas</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-600">{profile.experience}</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {profile.experience}
+                  </p>
                   <p className="text-sm text-gray-600">Experiência</p>
                 </div>
               </div>
@@ -343,32 +372,50 @@ export default function ProfileTab() {
 
           {/* Seção dos Pokémons */}
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">🧑‍🎓 Meus Pokémons</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              🧑‍🎓 Meus Pokémons
+            </h2>
+
             {/* Formulário para criar pokémon */}
-            <form onSubmit={handleCreatePokemon} className="flex gap-2 mb-6">
-              <select
-                value={novoTipo}
-                onChange={e => setNovoTipo(e.target.value)}
-                className="border rounded px-3 py-2"
-                disabled={criandoPokemon}
-              >
-                {tiposDisponiveis.map(tipo => (
-                  <option key={tipo} value={tipo}>{tipo}</option>
+            <form
+              onSubmit={handleCreatePokemon}
+              className="flex gap-2 mb-6 justify-between items-center"
+            >
+              <div className="flex gap-2">
+                {tiposDisponiveis.map((tipo) => (
+                  <button
+                    key={tipo}
+                    value={tipo}
+                    className={
+                      novoTipo === tipo
+                        ? "bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700 transition"
+                        : "bg-gray-200 text-gray-700 px-4 py-2 rounded font-semibold hover:bg-gray-300 transition"
+                    }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setNovoTipo(tipo);
+                    }}
+                  >
+                    <Image
+                      src={`/assets/8bit/${tipo}.webp`}
+                      alt={tipo}
+                      width={32}
+                      height={32}
+                    />
+                  </button>
                 ))}
-              </select>
+              </div>
               <button
                 type="submit"
                 className="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700 transition"
                 disabled={criandoPokemon}
               >
-                {criandoPokemon ? "Adicionando..." : "Adicionar Pokémon"}
+                {criandoPokemon ? "Adicionando..." : "Adicionar"}
               </button>
             </form>
-
             {/* Grid de pokémons */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {pokemons.map(pokemon => (
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {pokemons.map((pokemon) => (
                 <PokemonCard key={pokemon.id} pokemon={pokemon} />
               ))}
               {pokemons.length === 0 && (
@@ -383,4 +430,4 @@ export default function ProfileTab() {
       )}
     </div>
   );
-} 
+}

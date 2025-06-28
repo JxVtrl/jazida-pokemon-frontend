@@ -10,13 +10,18 @@ export interface Pokemon {
   id: number;
   tipo: string;
   treinador: string | number;
+  treinador_nome?: string;
   nivel: number;
+  batalhas?: number;
+  vitorias?: number;
+  derrotas?: number;
+  winRate?: number;
   nivelAnterior?: number;
 }
 
 export interface BattleResult {
   pokemon: Pokemon;
-  result: 'victory' | 'defeat' | 'death';
+  result: "victory" | "defeat" | "death";
 }
 
 export interface BattlePokemon {
@@ -26,5 +31,5 @@ export interface BattlePokemon {
   nivel: number;
   vida: number;
   vidaMaxima: number;
-  status: 'ready' | 'attacking' | 'defending' | 'fainted';
-} 
+  status: "ready" | "attacking" | "defending" | "fainted";
+}

@@ -1,9 +1,12 @@
 import { useAuth } from "@/context/AuthContext";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 interface HeaderProps {
-  activeTab: 'list' | 'battle' | 'challenges' | 'history' | 'profile';
-  onTabChange: (tab: 'list' | 'battle' | 'challenges' | 'history' | 'profile') => void;
+  activeTab: "list" | "battle" | "challenges" | "history" | "profile";
+  onTabChange: (
+    tab: "list" | "battle" | "challenges" | "history" | "profile",
+  ) => void;
 }
 
 export default function Header({ activeTab, onTabChange }: HeaderProps) {
@@ -12,41 +15,45 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const tabs = [
-    { id: 'list', label: '📋 Ranking', color: 'blue' },
-    { id: 'challenges', label: '🥊 Treinadores', color: 'purple' },
-    { id: 'history', label: '📜 Histórico', color: 'orange' },
-    { id: 'profile', label: '👤 Perfil', color: 'indigo' }
+    { id: "list", label: "📋 Ranking", color: "blue" },
+    { id: "challenges", label: "🥊 Treinadores", color: "purple" },
+    { id: "history", label: "📜 Histórico", color: "orange" },
+    { id: "profile", label: "👤 Perfil", color: "indigo" },
   ] as const;
 
   // Fechar dropdown quando clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const getTabClasses = (tabId: string, color: string) => {
     const isActive = activeTab === tabId;
-    const baseClasses = "px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm";
-    
+    const baseClasses =
+      "px-4 py-2 rounded-md font-medium transition-all duration-200 text-sm";
+
     if (isActive) {
       const colorClasses = {
-        blue: 'bg-blue-500 text-white shadow-lg',
-        red: 'bg-red-600 text-white shadow-lg',
-        purple: 'bg-purple-600 text-white shadow-lg',
-        orange: 'bg-orange-600 text-white shadow-lg',
-        indigo: 'bg-indigo-600 text-white shadow-lg'
+        blue: "bg-blue-500 text-white shadow-lg",
+        red: "bg-red-600 text-white shadow-lg",
+        purple: "bg-purple-600 text-white shadow-lg",
+        orange: "bg-orange-600 text-white shadow-lg",
+        indigo: "bg-indigo-600 text-white shadow-lg",
       };
       return `${baseClasses} ${colorClasses[color as keyof typeof colorClasses]}`;
     }
-    
+
     return `${baseClasses} text-gray-600 hover:text-gray-800 hover:bg-gray-50`;
   };
 
@@ -69,7 +76,9 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
               <h1 className="text-2xl font-bold text-gray-800">
                 Jazida Pokémon Challenge
               </h1>
-              <p className="text-sm text-gray-500">Sistema de Batalhas em Tempo Real</p>
+              <p className="text-sm text-gray-500">
+                Sistema de Batalhas em Tempo Real
+              </p>
             </div>
           </div>
 
@@ -79,13 +88,15 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span>Online</span>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-gray-800">{user?.nome}</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {user?.nome}
+                </p>
                 <p className="text-xs text-gray-500">Treinador</p>
               </div>
-              
+
               {/* Avatar com Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -93,7 +104,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
                   className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center hover:ring-2 hover:ring-blue-300 transition-all"
                 >
                   {user?.avatar_url ? (
-                    <img
+                    <Image
                       src={user.avatar_url}
                       alt="Avatar"
                       className="w-8 h-8 rounded-full object-cover"
@@ -141,4 +152,4 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
       </div>
     </header>
   );
-} 
+}
