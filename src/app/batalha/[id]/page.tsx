@@ -186,6 +186,8 @@ export default function BatalhaPage() {
         <Image
           src={backGif}
           alt={tipo + " costas"}
+          width={128}
+          height={128}
           className="w-32 h-32 object-contain mx-auto"
         />
       );
@@ -194,6 +196,8 @@ export default function BatalhaPage() {
       <Image
         src={gifPath}
         alt={tipo}
+        width={128}
+        height={128}
         className="w-32 h-32 object-contain mx-auto"
       />
     );
@@ -315,11 +319,15 @@ export default function BatalhaPage() {
                 opponentPokemon.tipo,
                 opponentPokemon.nivel,
               )}
+              width={160}
+              height={160}
               className="w-40 h-40"
               alt={opponentPokemon.tipo}
             />
             <Image
               src={getPokemonGifByLevel(myPokemon.tipo, myPokemon.nivel)}
+              width={160}
+              height={160}
               className="w-40 h-40"
               alt={myPokemon.tipo}
             />
@@ -407,6 +415,8 @@ export default function BatalhaPage() {
                   >
                     <Image
                       src={getPokemonGifByLevel(pokemon.tipo, pokemon.nivel)}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 mr-2"
                       alt={pokemon.tipo}
                     />

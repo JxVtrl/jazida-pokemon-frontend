@@ -215,6 +215,8 @@ export default function ProfileTab() {
                       `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.nome}`
                     }
                     alt="Avatar"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full border-4 border-gray-200 mx-auto"
                   />
                   <button

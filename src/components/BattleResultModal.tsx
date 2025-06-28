@@ -95,6 +95,8 @@ export default function BattleResultModal({
             <Image
               src={getPokemonGifByLevel(pokemon.tipo, pokemon.nivel)}
               alt={pokemon.tipo}
+              width={128}
+              height={128}
               className="w-32 h-32 object-contain mx-auto"
             />
           </div>

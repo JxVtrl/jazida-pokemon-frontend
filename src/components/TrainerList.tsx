@@ -174,6 +174,8 @@ export default function TrainerList() {
                     `https://api.dicebear.com/7.x/avataaars/svg?seed=${trainer.nome}`
                   }
                   alt="Avatar"
+                  width={48}
+                  height={48}
                   className="w-12 h-12 rounded-full border-2 border-gray-200"
                 />
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
