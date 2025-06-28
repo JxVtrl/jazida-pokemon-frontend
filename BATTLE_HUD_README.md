@@ -13,7 +13,7 @@ O componente `BattleHUD` é uma interface interativa para realizar batalhas entr
 - Validação para evitar seleção do mesmo pokémon
 
 ### ⚔️ **Sistema de Batalha**
-- Botão "Batalhar" que aciona `POST /batalhar/:idA/:idB`
+- Botão "Batalhar" que aciona `POST /batalha/:idA/:idB`
 - Animação fake estilo Pokémon durante a batalha
 - Barras de HP animadas
 - Loading spinner durante o processo
@@ -80,7 +80,7 @@ O componente é totalmente responsivo:
 1. useEffect → fetchPokemons()
 2. GET /pokemons → setPokemons()
 3. Seleção → setSelectedPokemonA/B()
-4. Batalha → POST /batalhar/:idA/:idB
+4. Batalha → POST /batalha/:idA/:idB
 5. Resultado → setBattleResult()
 6. Atualização → fetchPokemons() (nova lista)
 ```

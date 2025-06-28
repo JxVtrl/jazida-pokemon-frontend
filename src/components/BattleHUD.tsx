@@ -40,7 +40,7 @@ export default function BattleHUD() {
     const fetchPokemons = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get('/pokemons');
+            const response = await api.get('/pokemons/public');
             setPokemons(response.data);
             setError(null);
         } catch (err) {
@@ -80,7 +80,7 @@ export default function BattleHUD() {
             // Simular animação de batalha
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            const response = await api.post(`/batalhar/${selectedPokemonA.id}/${selectedPokemonB.id}`);
+            const response = await api.post(`/batalha/${selectedPokemonA.id}/${selectedPokemonB.id}`);
             const result: BattleResult = response.data;
 
             setBattleResult(result);

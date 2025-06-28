@@ -8,14 +8,22 @@ import { useBattleStore } from "@/store/battleStore";
 interface Trainer {
     id: number;
     nome: string;
+    avatar_url?: string;
+    total_battles: number;
+    wins: number;
+    losses: number;
+    level: number;
+    experience: number;
+    winRate: number;
+    status_message?: string;
 }
 
 export default function TrainerList() {
     const { user, token } = useAuth();
     const router = useRouter();
-    const { connectSocket, trainer, setTrainer } = useBattleStore();
+    const { setTrainer, connectSocket } = useBattleStore();
     const [trainers, setTrainers] = useState<Trainer[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [desafiando, setDesafiando] = useState<number | null>(null);
 
@@ -32,77 +40,50 @@ export default function TrainerList() {
             setLoading(true);
             setError("");
             try {
-                const res = await api.get("/treinadores", {
-                    headers: { Authorization: `Bearer ${token}` },
+                const res = await api.get("/treinadores");
+                console.log('✅ Treinadores recebidos:', res.data);
+                
+                // Calcular estatísticas para cada treinador
+                const trainersWithStats = res.data.treinadores.map((trainer: any) => {
+                    const winRate = trainer.total_battles > 0 
+                        ? Math.round((trainer.wins / trainer.total_battles) * 100) 
+                        : 0;
+                    
+                    return {
+                        ...trainer,
+                        winRate
+                    };
                 });
-                setTrainers(res.data.treinadores || []);
+                
+                setTrainers(trainersWithStats);
             } catch (err: any) {
-                setError("Erro ao buscar treinadores.");
+                console.error('❌ Erro ao buscar treinadores:', err);
+                setError("Erro ao carregar lista de treinadores");
             } finally {
                 setLoading(false);
             }
         }
         fetchTrainers();
-    }, [token, user, setTrainer, connectSocket]);
+    }, [user, setTrainer, connectSocket]);
 
-    useEffect(() => {
-        if (!user) return;
+    const getWinRateColor = (winRate: number) => {
+        if (winRate >= 70) return 'text-green-600';
+        if (winRate >= 50) return 'text-yellow-600';
+        return 'text-red-600';
+    };
 
-        // Configurar listener para convites de batalha
-        const handleBattleInvite = (data: {
-            battleId: string;
-            trainerAId: number;
-            trainerBId: number;
-            type: 'challenger' | 'challenged';
-        }) => {
-            console.log('🎯 Convite de batalha recebido:', data);
-
-            if (data.type === 'challenged') {
-                // Se foi desafiado, redirecionar para a batalha
-                router.push(`/batalha/${data.battleId}`);
-            } else {
-                // Se foi o desafiador, mostrar mensagem de sucesso
-                console.log('✅ Desafio enviado com sucesso!');
-            }
-        };
-
-        // Adicionar listener (simulado por enquanto)
-        // Em uma implementação real, isso viria do Socket.IO
-        const handleCustomEvent = (event: Event) => {
-            const customEvent = event as CustomEvent;
-            handleBattleInvite(customEvent.detail);
-        };
-
-        window.addEventListener('battle-invite', handleCustomEvent);
-
-        return () => {
-            window.removeEventListener('battle-invite', handleCustomEvent);
-        };
-    }, [user, router]);
+    const getLevelColor = (level: number) => {
+        if (level >= 10) return 'text-purple-600';
+        if (level >= 5) return 'text-blue-600';
+        return 'text-gray-600';
+    };
 
     async function handleDesafiar(trainerBId: number) {
         setDesafiando(trainerBId);
         setError("");
         try {
-            const res = await api.post(`/desafiar/${trainerBId}`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
+            const res = await api.post(`/batalha/desafiar/${trainerBId}`);
             console.log('⚔️ Desafio enviado:', res.data);
-
-            // Simular recebimento do convite (em uma implementação real seria via Socket.IO)
-            setTimeout(() => {
-                const event = new CustomEvent('battle-invite', {
-                    detail: {
-                        battleId: res.data.battleId,
-                        trainerAId: res.data.trainerAId,
-                        trainerBId: res.data.trainerBId,
-                        type: 'challenger'
-                    }
-                });
-                window.dispatchEvent(event);
-            }, 1000);
-
         } catch (err: any) {
             setError(err?.response?.data?.error || "Erro ao desafiar treinador.");
         } finally {
@@ -110,32 +91,138 @@ export default function TrainerList() {
         }
     }
 
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Carregando treinadores...</span>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-red-600">{error}</p>
+                <button 
+                    onClick={() => {
+                        // Aqui você pode implementar a lógica para atualizar a lista de treinadores
+                        fetchTrainers();
+                    }}
+                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    Tentar novamente
+                </button>
+            </div>
+        );
+    }
+
+    if (trainers.length === 0) {
+        return (
+            <div className="text-center py-8">
+                <div className="text-4xl mb-4">🥊</div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Nenhum treinador encontrado</h3>
+                <p className="text-gray-500">Não há treinadores disponíveis para batalha no momento.</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="max-w-xl mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4 text-center text-white">Treinadores Disponíveis</h2>
-            {error && <div className="text-red-400 text-center mb-4">{error}</div>}
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow p-6">
-                {loading ? (
-                    <div className="text-center text-white">Carregando...</div>
-                ) : (
-                    <ul className="divide-y divide-white/20">
-                        {trainers.filter(t => t.id !== user?.id).map(trainer => (
-                            <li key={trainer.id} className="flex items-center justify-between py-3">
-                                <span className="font-medium text-white">{trainer.nome}</span>
-                                <button
-                                    onClick={() => handleDesafiar(trainer.id)}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                                    disabled={desafiando === trainer.id}
-                                >
-                                    {desafiando === trainer.id ? "Desafiando..." : "Desafiar"}
-                                </button>
-                            </li>
-                        ))}
-                        {trainers.filter(t => t.id !== user?.id).length === 0 && (
-                            <li className="text-center text-white/70 py-4">Nenhum treinador disponível.</li>
-                        )}
-                    </ul>
-                )}
+        <div className="space-y-4">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">⚔️ Treinadores Online</h2>
+                <button 
+                    onClick={() => {
+                        // Aqui você pode implementar a lógica para atualizar a lista de treinadores
+                        fetchTrainers();
+                    }}
+                    className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                >
+                    🔄 Atualizar
+                </button>
+            </div>
+
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {trainers.filter((trainer) => trainer.id !== user?.id).map((trainer) => (
+                    <div 
+                        key={trainer.id}
+                        className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow border border-gray-100"
+                    >
+                        {/* Header do Treinador */}
+                        <div className="flex items-center space-x-4 mb-4">
+                            <div className="relative">
+                                <img
+                                    src={trainer.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${trainer.nome}`}
+                                    alt="Avatar"
+                                    className="w-12 h-12 rounded-full border-2 border-gray-200"
+                                />
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-bold text-gray-800 text-lg">{trainer.nome}</h3>
+                                <p className="text-sm text-gray-500">
+                                    {trainer.status_message || 'Treinador Pokémon'}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* 
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Nível</span>
+                                <span className={`font-bold ${getLevelColor(trainer.level)}`}>
+                                    {trainer.level}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Taxa de Vitória</span>
+                                <span className={`font-bold ${getWinRateColor(trainer.winRate)}`}>
+                                    {trainer.winRate}%
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Total de Batalhas</span>
+                                <span className="font-bold text-gray-800">
+                                    {trainer.total_battles}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Vitórias</span>
+                                <span className="font-bold text-green-600">
+                                    {trainer.wins}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Derrotas</span>
+                                <span className="font-bold text-red-600">
+                                    {trainer.losses}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600">Experiência</span>
+                                <span className="font-bold text-blue-600">
+                                    {trainer.experience}
+                                </span>
+                            </div>
+                        </div> 
+                        */}
+
+                        {/* Botão de Desafio */}
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            <button
+                                className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors font-semibold"
+                                onClick={() => handleDesafiar(trainer.id)}
+                            >
+                                🥊 Desafiar
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );
