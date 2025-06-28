@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 const gifMap: Record<string, string> = {
     pikachu: "/gifs/pikachu.gif",
@@ -81,9 +81,11 @@ export default function PokemonCard({ pokemon, 'data-testid': testId }: PokemonC
                 {/* GIF central ou emoji */}
                 <div className={`flex flex-col items-center justify-center flex-1 py-2 min-h-[90px] min-w-0`}>
                     {gifSrc ? (
-                        <img
+                        <Image
                             src={gifSrc}
                             alt={config.name}
+                            width={80}
+                            height={80}
                             className={`w-auto mb-1 drop-shadow-lg h-[100%]`}
                             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                         />

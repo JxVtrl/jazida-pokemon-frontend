@@ -97,24 +97,6 @@ export default function BattleHUD() {
         }
     };
 
-    const getPokemonImage = (tipo: string) => {
-        const images = {
-            pikachu: '⚡',
-            charizard: '🔥',
-            mewtwo: '🧬'
-        };
-        return images[tipo as keyof typeof images] || '❓';
-    };
-
-    const getTypeColor = (tipo: string) => {
-        const colors = {
-            pikachu: 'bg-yellow-100 border-yellow-300',
-            charizard: 'bg-red-100 border-red-300',
-            mewtwo: 'bg-purple-100 border-purple-300'
-        };
-        return colors[tipo as keyof typeof colors] || 'bg-gray-100 border-gray-300';
-    };
-
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-6 relative">
             <Card>

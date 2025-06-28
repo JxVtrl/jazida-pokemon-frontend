@@ -1,23 +1,29 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Home from '@/app/page';
+import api from '@/lib/api';
 
 // Estado global dos pokémons
-let mockPokemons: any[] = [];
+let mockPokemons: Array<{
+    id: number;
+    tipo: string;
+    treinador: string;
+    nivel: number;
+}> = [];
 
 jest.mock('@/lib/api', () => {
     return {
         __esModule: true,
         default: {
             get: jest.fn(() => Promise.resolve({ data: [...mockPokemons] })),
-            post: jest.fn((url, data) => {
+            post: jest.fn((url: string, data: { tipo: string; treinador: string; nivel?: number }) => {
                 const newPokemon = { id: mockPokemons.length + 1, ...data };
                 mockPokemons.push(newPokemon);
                 return Promise.resolve({ data: newPokemon });
             }),
-            put: jest.fn((url, data) => {
+            put: jest.fn((url: string, data: { tipo?: string; treinador?: string; nivel?: number }) => {
                 const id = parseInt(url.split('/').pop()!);
                 const index = mockPokemons.findIndex(p => p.id === id);
                 if (index !== -1) {
@@ -25,7 +31,7 @@ jest.mock('@/lib/api', () => {
                 }
                 return Promise.resolve({ data: mockPokemons[index] });
             }),
-            delete: jest.fn((url) => {
+            delete: jest.fn((url: string) => {
                 const id = parseInt(url.split('/').pop()!);
                 mockPokemons = mockPokemons.filter(p => p.id !== id);
                 return Promise.resolve({ data: { message: 'Pokémon removido' } });
@@ -36,7 +42,7 @@ jest.mock('@/lib/api', () => {
 
 describe('Fluxo completo de gerenciamento de pokémons', () => {
     const user = userEvent.setup();
-    const mockApi = require('@/lib/api').default;
+    const mockApi = api as jest.Mocked<typeof api>;
 
     beforeEach(() => {
         jest.clearAllMocks();

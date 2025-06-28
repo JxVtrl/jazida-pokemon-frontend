@@ -5,12 +5,14 @@ import api from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 const tiposValidos = ["pikachu", "charizard", "mewtwo"];
 
 export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
     const [tipo, setTipo] = useState("");
     const [treinador, setTreinador] = useState("");
+    const [nivel, setNivel] = useState(1);
     const [erro, setErro] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -32,10 +34,12 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
             setIsLoading(true);
             await api.post("/pokemons", {
                 tipo: tipo.toLowerCase(),
-                treinador: treinador.trim()
+                treinador: treinador.trim(),
+                nivel: nivel
             });
             setTipo("");
             setTreinador("");
+            setNivel(1);
             setErro("");
             setIsLoading(false);
             if (onCreated) onCreated();
@@ -59,9 +63,11 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
                                 className={`border-2 rounded-lg p-2 transition-all focus:outline-none ${tipo === t ? 'border-blue-600 ring-2 ring-blue-300' : 'border-gray-300 hover:border-blue-400'}`}
                                 aria-label={t}
                             >
-                                <img
+                                <Image
                                     src={`/8bit/${t}.webp`}
                                     alt={t}
+                                    width={48}
+                                    height={48}
                                     className="w-12 h-12 mx-auto"
                                 />
                                 <span className="block text-xs mt-1 capitalize font-semibold text-gray-700">{t}</span>
@@ -78,6 +84,25 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
                             placeholder="Nome do Treinador"
                             value={treinador}
                             onChange={(e) => setTreinador(e.target.value)}
+                            disabled={isLoading}
+                        />
+                    </div>
+                    
+                    <div>
+                        <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-1">
+                            Nível
+                        </label>
+                        <Input
+                            id="nivel"
+                            type="number"
+                            min="1"
+                            max="100"
+                            value={nivel}
+                            onChange={(e) => {
+                                const val = e.target.valueAsNumber;
+                                if (isNaN(val) || val < 1) setNivel(1);
+                                else setNivel(val);
+                            }}
                             disabled={isLoading}
                         />
                     </div>

@@ -27,7 +27,7 @@ jest.mock('next/router', () => ({
 // Mock do Next.js Image
 jest.mock('next/image', () => ({
     __esModule: true,
-    default: (props) => {
+    default: (props: any) => {
         // eslint-disable-next-line @next/next/no-img-element
         return <img {...props} />;
     },
@@ -36,7 +36,7 @@ jest.mock('next/image', () => ({
 // Mock do Next.js Link
 jest.mock('next/link', () => ({
     __esModule: true,
-    default: ({ children, href, ...props }) => {
+    default: ({ children, href, ...props }: any) => {
         return <a href={href} {...props}>{children}</a>;
     },
 }));
@@ -45,7 +45,7 @@ jest.mock('next/link', () => ({
 jest.mock('next/head', () => {
     return {
         __esModule: true,
-        default: ({ children }) => {
+        default: ({ children }: any) => {
             return <>{children}</>;
         },
     };

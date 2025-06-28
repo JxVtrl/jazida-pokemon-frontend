@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BattleHUD from '../BattleHUD';
+import api from '@/lib/api';
 
 // Mock da API
 jest.mock('@/lib/api', () => ({
@@ -14,7 +15,7 @@ jest.mock('@/lib/api', () => ({
 }));
 
 describe('BattleHUD', () => {
-    const mockApi = require('@/lib/api').default;
+    const mockApi = api as jest.Mocked<typeof api>;
 
     beforeEach(() => {
         jest.clearAllMocks();

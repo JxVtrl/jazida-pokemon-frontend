@@ -123,12 +123,12 @@ describe('Performance Tests', () => {
     });
 
     it('testa uso de memória', () => {
-        const initialMemory = (performance as any).memory?.usedJSHeapSize || 0;
+        const initialMemory = (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
 
         // Criar muitos componentes
         const components = Array.from({ length: 100 }, (_, i) => ({
             id: i,
-            tipo: ['pikachu', 'charizard', 'mewtwo'][i % 3],
+            tipo: ['pikachu', 'charizard', 'mewtwo'][i % 3] as string,
             treinador: `Treinador ${i}`,
             nivel: Math.floor(Math.random() * 100) + 1
         }));
@@ -143,12 +143,12 @@ describe('Performance Tests', () => {
             </div>
         );
 
-        const memoryAfterRender = (performance as any).memory?.usedJSHeapSize || 0;
+        const memoryAfterRender = (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
 
         // Limpar componentes
         unmount();
 
-        const memoryAfterUnmount = (performance as any).memory?.usedJSHeapSize || 0;
+        const memoryAfterUnmount = (performance as { memory?: { usedJSHeapSize: number } }).memory?.usedJSHeapSize || 0;
 
         // Verificar se memória foi liberada (aproximadamente)
         if (initialMemory > 0) {
