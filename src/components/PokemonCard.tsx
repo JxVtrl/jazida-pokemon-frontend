@@ -71,10 +71,12 @@ export default function PokemonCard({ pokemon, 'data-testid': testId }: PokemonC
             data-testid={testId || 'pokemon-card'}
         >
             <div className="absolute inset-0 flex flex-col min-w-0 gap-1">
-                {/* Topo: Nome, HP, energia */}
+                {/* Topo: Nome, Nível, emoji */}
                 <div className="flex items-center px-3 pt-2 pb-1 min-w-0">
                     <span className="font-bold capitalize tracking-wide text-gray-900 drop-shadow-sm truncate block min-w-0" style={{ fontSize: '1rem', maxWidth: '110px', lineHeight: '1.1' }}>{config.name}</span>
-                    <span className="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap" style={{ fontSize: '0.9rem' }}>HP {config.hp} <span className="text-xl">{config.energy}</span></span>
+                    <span className="flex-shrink-0 flex items-center gap-1 font-bold text-purple-900 drop-shadow-sm ml-auto whitespace-nowrap" style={{ fontSize: '0.9rem' }}>
+                        Nível {pokemon.nivel} <span className="text-xl">{config.emoji}</span>
+                    </span>
                 </div>
                 {/* Linha fina */}
                 <div className="border-t border-yellow-300 mx-2 mb-1" />
@@ -97,10 +99,6 @@ export default function PokemonCard({ pokemon, 'data-testid': testId }: PokemonC
                 {/* Box de informações */}
                 <div className={`bg-white/80 rounded-lg mx-2 px-2 py-1 shadow-inner border border-yellow-200 mb-1 text-xs min-w-0`}>
                     <div className="flex justify-between items-center mb-1 min-w-0 text-[10px]">
-                        <span className="font-semibold text-gray-700">Nível:</span>
-                        <span className="font-bold text-gray-800">{pokemon.nivel}</span>
-                    </div>
-                    <div className="flex justify-between items-center min-w-0 text-[10px]">
                         <span className="font-semibold text-gray-700">Treinador:</span>
                         <span className="font-bold text-blue-700 break-words min-w-0 max-w-[90px]" style={{ wordBreak: 'break-word' }}>{pokemon.treinador}</span>
                     </div>

@@ -87,25 +87,7 @@ export default function PokemonForm({ onCreated }: { onCreated?: () => void }) {
                             disabled={isLoading}
                         />
                     </div>
-                    
-                    <div>
-                        <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-1">
-                            Nível
-                        </label>
-                        <Input
-                            id="nivel"
-                            type="number"
-                            min="1"
-                            max="100"
-                            value={nivel}
-                            onChange={(e) => {
-                                const val = e.target.valueAsNumber;
-                                if (isNaN(val) || val < 1) setNivel(1);
-                                else setNivel(val);
-                            }}
-                            disabled={isLoading}
-                        />
-                    </div>
+
                     
                     {erro && <p className="text-red-600 text-sm">{erro}</p>}
                     <Button type="submit" className="w-full" disabled={isLoading}>
