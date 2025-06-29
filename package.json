@@ -12,15 +12,6 @@
     "test:coverage": "jest --coverage",
     "prepare": "husky install"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@types/socket.io-client": "^3.0.0",
