@@ -10,9 +10,11 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import RequireAuth from "@/components/RequireAuth";
 import { useBattleStore } from "@/store/battleStore";
+import { useAuth } from "@/context/AuthContext";
 import type { Pokemon, BattleResult } from "@/types";
 
 export default function Home() {
+  const { user } = useAuth();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [activeTab, setActiveTab] = useState<
     "list" | "battle" | "challenges" | "history" | "profile"
@@ -44,8 +46,11 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    // Só buscar pokémons se o usuário estiver autenticado
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   useEffect(() => {
     // Limpa o estado da batalha ao entrar na home
