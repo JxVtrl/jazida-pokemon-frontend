@@ -14,7 +14,6 @@ Interface inspirada no HUD clássico dos jogos de Pokémon, desenvolvida em Next
 
 ## 📦 Instalação
 
-
 ```bash
 # Instalar dependências
 npm install
@@ -44,6 +43,7 @@ NODE_ENV=development
 - **URL da API Backend:** [https://jazida.api.majorssolutions.com.br](https://jazida.api.majorssolutions.com.br)
 
 **Configuração recomendada para produção (.env.production ou nas variáveis da Vercel):**
+
 ```env
 NEXT_PUBLIC_API_URL=https://jazida.api.majorssolutions.com.br
 ```
@@ -70,6 +70,7 @@ npm run type-check
 ## 🎨 Interface e Componentes
 
 ### 🎮 Layout Principal
+
 - **Header**: Logo e navegação
 - **Sidebar**: Lista de Pokémons e controles
 - **Battle Arena**: Área principal da batalha
@@ -78,7 +79,9 @@ npm run type-check
 ### 🎯 Componentes Principais
 
 #### `PokemonCard`
+
 Exibe informações de um Pokémon individual:
+
 - Avatar do Pokémon
 - Nome do treinador
 - Nível atual
@@ -86,21 +89,27 @@ Exibe informações de um Pokémon individual:
 - Ações (editar, deletar)
 
 #### `BattleArena`
+
 Simula a batalha com animações:
+
 - Posicionamento dos Pokémons
 - Efeitos visuais de ataques
 - Log de batalha em tempo real
 - Animações de vitória/derrota
 
 #### `PokemonForm`
+
 Formulário para criar/editar Pokémons:
+
 - Seleção de tipo (Pikachu, Charizard, Mewtwo)
 - Campo de treinador
 - Nível inicial
 - Validação em tempo real
 
 #### `BattleControls`
+
 Controles para iniciar batalhas:
+
 - Seleção de dois Pokémons
 - Botão de iniciar batalha
 - Status da batalha atual
@@ -108,6 +117,7 @@ Controles para iniciar batalhas:
 ## 🎨 Design System
 
 ### Cores (Inspiradas no GameBoy)
+
 ```css
 --gameboy-green: #9bbc0f;
 --gameboy-dark-green: #306230;
@@ -116,10 +126,12 @@ Controles para iniciar batalhas:
 ```
 
 ### Tipografia
+
 - **Fonte principal**: 'Press Start 2P' (Google Fonts)
 - **Fonte secundária**: 'VT323' para elementos retro
 
 ### Componentes Visuais
+
 - **Bordas**: Estilo pixel art
 - **Sombras**: Efeito de profundidade GameBoy
 - **Animações**: Transições suaves com suspense
@@ -127,21 +139,25 @@ Controles para iniciar batalhas:
 ## 📱 Páginas
 
 ### `/` - Dashboard Principal
+
 - Visão geral dos Pokémons
 - Estatísticas de batalhas
 - Acesso rápido às funcionalidades
 
 ### `/pokemons` - Gerenciamento
+
 - Lista completa de Pokémons
 - CRUD operations
 - Filtros e busca
 
 ### `/battle` - Arena de Batalha
+
 - Interface principal de batalha
 - Seleção de Pokémons
 - Simulação visual
 
 ### `/history` - Histórico
+
 - Registro de batalhas anteriores
 - Estatísticas detalhadas
 - Rankings
@@ -149,33 +165,35 @@ Controles para iniciar batalhas:
 ## 🔌 Integração com Backend
 
 ### API Calls
+
 ```typescript
 // Exemplo de chamada para API
 const createPokemon = async (data: PokemonFormData) => {
   const response = await fetch(`${API_URL}/pokemons`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
   return response.json();
 };
 ```
 
 ### Socket.IO Events
+
 ```typescript
 // Conectar ao socket
 const socket = io(SOCKET_URL);
 
 // Escutar eventos de batalha
-socket.on('battle:start', (data) => {
+socket.on("battle:start", (data) => {
   // Iniciar animação de batalha
 });
 
-socket.on('battle:update', (data) => {
+socket.on("battle:update", (data) => {
   // Atualizar progresso da batalha
 });
 
-socket.on('battle:end', (data) => {
+socket.on("battle:end", (data) => {
   // Mostrar resultado final
 });
 ```
@@ -183,6 +201,7 @@ socket.on('battle:end', (data) => {
 ## 🎭 Animações e Efeitos
 
 ### Batalha
+
 - **Entrada**: Pokémons aparecem com fade-in
 - **Ataques**: Efeitos de partículas e shake
 - **HP**: Barras diminuem gradualmente
@@ -190,6 +209,7 @@ socket.on('battle:end', (data) => {
 - **Derrota**: Fade-out triste
 
 ### Transições
+
 - **Páginas**: Slide transitions
 - **Modais**: Fade com backdrop
 - **Loading**: Spinner estilo GameBoy
@@ -197,13 +217,14 @@ socket.on('battle:end', (data) => {
 ## 📊 Estado da Aplicação
 
 ### Zustand Store
+
 ```typescript
 interface PokemonStore {
   pokemons: Pokemon[];
   selectedPokemon: Pokemon | null;
   battleState: BattleState;
   isLoading: boolean;
-  
+
   // Actions
   fetchPokemons: () => Promise<void>;
   createPokemon: (data: PokemonFormData) => Promise<void>;
@@ -236,6 +257,7 @@ npm run test:e2e
 ## 🚀 Deploy
 
 ### Vercel (Recomendado)
+
 ```bash
 # Deploy automático
 vercel
@@ -245,6 +267,7 @@ vercel --prod
 ```
 
 ### Netlify
+
 ```bash
 # Build e deploy
 npm run build
@@ -269,16 +292,18 @@ netlify deploy --prod --dir=out
 ## 🎮 Funcionalidades Especiais
 
 ### Modo Nostálgico
+
 - Filtros visuais estilo CRT
-- Som de GameBoy (opcional)
 - Efeitos de scanlines
 
 ### Modo Competitivo
+
 - Rankings de treinadores
 - Estatísticas detalhadas
 - Conquistas e badges
 
 ### Modo Sandbox
+
 - Batalhas infinitas
 - Pokémons com níveis altos
 - Modo teste para desenvolvimento
