@@ -1,4 +1,8 @@
 export function getPokemonGifByLevel(tipo: string, nivel: number): string {
+  if (!tipo) {
+    return "/assets/gifs/spinner.gif";
+  }
+
   let gifFile = `${tipo}.gif`;
 
   if (nivel >= 10 && nivel < 20) {
@@ -7,5 +11,7 @@ export function getPokemonGifByLevel(tipo: string, nivel: number): string {
     gifFile = `${tipo}-2.gif`;
   }
 
-  return `/assets/gifs/${tipo.toLowerCase()}/${gifFile}`;
-} 
+  const gifPath = `/assets/gifs/${tipo.toLowerCase()}/${gifFile}`;
+
+  return gifPath;
+}

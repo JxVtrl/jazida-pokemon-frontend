@@ -1,43 +1,39 @@
-import { useEffect, useState } from "react";
 import { getPokemonGifByLevel } from "@/utils/getPokemonGifByLevel";
-import type { Pokemon } from "@/types";
 import Image from "next/image";
+import { useBattleStore } from "@/store/battleStore";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
-interface BattleResultModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  pokemon: (Pokemon & { nivelAnterior?: number }) | null;
-  result: "victory" | "defeat" | "death" | null;
-}
+export default function BattleResultModal() {
+  const { battle } = useBattleStore();
+  const { user } = useAuth();
+  const router = useRouter();
 
-export default function BattleResultModal({
-  isOpen,
-  onClose,
-  pokemon,
-  result,
-}: BattleResultModalProps) {
-  const [showAnimation, setShowAnimation] = useState(false);
+  if (
+    battle?.status !== "finished" ||
+    !battle ||
+    !battle.winner ||
+    !battle.loser ||
+    !battle.pokemonA ||
+    !battle.pokemonB
+  )
+    return null;
 
-  useEffect(() => {
-    if (isOpen && pokemon) {
-      setShowAnimation(false);
+  const didIWin = user?.id === battle.winner?.treinador;
+  const pokemon = didIWin ? battle.winner : battle.loser;
+  const pokemonDied = pokemon?.nivel === 0;
 
-      // Inicia a animação após um breve delay
-      setTimeout(() => {
-        setShowAnimation(true);
-      }, 500);
-    }
-  }, [isOpen, pokemon]);
-
-  if (!isOpen || !pokemon) return null;
+  const nivelAnterior = (
+    pokemon?.id === battle.pokemonA?.id ? battle.pokemonA : battle.pokemonB
+  )?.nivel;
 
   const getResultTitle = () => {
-    switch (result) {
-      case "victory":
+    switch (true) {
+      case didIWin:
         return "🎉 Vitória!";
-      case "defeat":
+      case !didIWin && !pokemonDied:
         return "😔 Derrota";
-      case "death":
+      case pokemonDied:
         return "💀 Pokémon Derrotado";
       default:
         return "Batalha Finalizada";
@@ -45,12 +41,12 @@ export default function BattleResultModal({
   };
 
   const getResultColor = () => {
-    switch (result) {
-      case "victory":
+    switch (true) {
+      case didIWin:
         return "text-green-600";
-      case "defeat":
+      case !didIWin && !pokemonDied:
         return "text-yellow-600";
-      case "death":
+      case pokemonDied:
         return "text-red-600";
       default:
         return "text-gray-600";
@@ -58,21 +54,21 @@ export default function BattleResultModal({
   };
 
   const getResultMessage = () => {
-    switch (result) {
-      case "victory":
+    switch (true) {
+      case didIWin:
         return "Seu pokémon ganhou experiência!";
-      case "defeat":
+      case !didIWin && !pokemonDied:
         return "Seu pokémon perdeu experiência...";
-      case "death":
+      case pokemonDied:
         return "Seu pokémon foi derrotado e não sobreviveu...";
       default:
         return "";
     }
   };
 
-  const getLevelChange = () => {
-    if (!pokemon.nivelAnterior) return null;
-    const change = pokemon.nivel - pokemon.nivelAnterior;
+  const getLevelChange = (nivelAnterior: number, nivelAtual: number) => {
+    if (!nivelAnterior) return null;
+    const change = nivelAtual - nivelAnterior;
     if (change > 0) return `+${change}`;
     if (change < 0) return `${change}`;
     return "0";
@@ -93,26 +89,27 @@ export default function BattleResultModal({
         <div className="text-center mb-6">
           <div className="mb-4">
             <Image
-              src={getPokemonGifByLevel(pokemon.tipo, pokemon.nivel)}
-              alt={pokemon.tipo}
+              src={getPokemonGifByLevel(
+                pokemon?.tipo?.toLowerCase() ?? "",
+                pokemon?.nivel ?? 0,
+              )}
+              alt={pokemon?.tipo ?? ""}
               width={128}
               height={128}
               className="w-32 h-32 object-contain mx-auto"
             />
           </div>
           <h3 className="text-xl font-bold text-gray-800 mb-2">
-            {pokemon.tipo}
+            {pokemon?.tipo?.charAt(0).toUpperCase() + pokemon?.tipo?.slice(1)}
           </h3>
 
           {/* Level Animation */}
           <div className="flex items-center justify-center gap-4">
-            {pokemon.nivelAnterior !== undefined && (
-              <span className="text-gray-500 text-lg">
-                Lv.{pokemon.nivelAnterior}
-              </span>
+            {nivelAnterior !== undefined && (
+              <span className="text-gray-500 text-lg">Lv.{nivelAnterior}</span>
             )}
 
-            {pokemon.nivelAnterior !== undefined && (
+            {nivelAnterior !== undefined && (
               <span className="text-2xl font-bold text-blue-600 animate-pulse">
                 →
               </span>
@@ -121,28 +118,28 @@ export default function BattleResultModal({
             <div className="relative">
               <span
                 className={`text-2xl font-bold transition-all duration-1000 ${
-                  showAnimation
-                    ? pokemon.nivel > (pokemon.nivelAnterior ?? 0)
-                      ? "text-green-600 scale-110"
-                      : pokemon.nivel < (pokemon.nivelAnterior ?? 0)
-                        ? "text-red-600 scale-110"
-                        : "text-gray-800"
-                    : "text-gray-800"
+                  pokemon?.nivel > (nivelAnterior ?? 0)
+                    ? "text-green-600 scale-110"
+                    : pokemon?.nivel < (nivelAnterior ?? 0)
+                      ? "text-red-600 scale-110"
+                      : "text-gray-800"
                 }`}
               >
-                Lv.{pokemon.nivel}
+                Lv.{pokemon?.nivel}
               </span>
 
               {/* Level Change Indicator */}
-              {showAnimation && getLevelChange() && (
+              {getLevelChange(nivelAnterior, pokemon?.nivel) && (
                 <span
                   className={`absolute -top-2 -right-8 text-sm font-bold animate-bounce ${
-                    getLevelChange()?.startsWith("+")
+                    getLevelChange(nivelAnterior, pokemon?.nivel)?.startsWith(
+                      "+",
+                    )
                       ? "text-green-600"
                       : "text-red-600"
                   }`}
                 >
-                  {getLevelChange()}
+                  {getLevelChange(nivelAnterior, pokemon?.nivel)}
                 </span>
               )}
             </div>
@@ -150,7 +147,7 @@ export default function BattleResultModal({
         </div>
 
         {/* Death Animation */}
-        {result === "death" && showAnimation && (
+        {pokemon?.nivel === 0 && (
           <div className="text-center mb-6">
             <div className="text-6xl animate-pulse text-red-600 mb-2">💀</div>
             <p className="text-red-600 font-semibold">
@@ -160,7 +157,7 @@ export default function BattleResultModal({
         )}
 
         {/* Victory Animation */}
-        {result === "victory" && showAnimation && (
+        {pokemon?.nivel > nivelAnterior && (
           <div className="text-center mb-6">
             <div className="text-4xl animate-bounce text-yellow-500 mb-2">
               ⭐
@@ -172,7 +169,9 @@ export default function BattleResultModal({
         {/* Close Button */}
         <div className="text-center">
           <button
-            onClick={onClose}
+            onClick={() => {
+              router.push("/");
+            }}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
           >
             Fechar

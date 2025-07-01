@@ -4,14 +4,12 @@ import PokemonCard from "@/components/PokemonCard";
 import TrainerList from "@/components/TrainerList";
 import BattleHistory from "@/components/BattleHistory";
 import ProfileTab from "@/components/ProfileTab";
-import BattleResultModal from "@/components/BattleResultModal";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import RequireAuth from "@/components/RequireAuth";
-import { useBattleStore } from "@/store/battleStore";
 import { useAuth } from "@/context/AuthContext";
-import type { Pokemon, BattleResult } from "@/types";
+import type { Pokemon } from "@/types";
 
 export default function Home() {
   const { user } = useAuth();
@@ -19,9 +17,6 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "list" | "battle" | "challenges" | "history" | "profile"
   >("list");
-  const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
-  const [showBattleModal, setShowBattleModal] = useState(false);
-  const { setBattle } = useBattleStore();
 
   // Novos estados para filtro e ordenação
   const [pokemonFilter, setPokemonFilter] = useState<string>("");
@@ -51,45 +46,6 @@ export default function Home() {
       fetchData();
     }
   }, [user]);
-
-  useEffect(() => {
-    // Limpa o estado da batalha ao entrar na home
-    setBattle(null);
-  }, [setBattle]);
-
-  // Verificar se há resultado de batalha no localStorage
-  useEffect(() => {
-    const checkBattleResult = () => {
-      const battleData = localStorage.getItem("battleResult");
-      if (battleData) {
-        try {
-          const result = JSON.parse(battleData);
-          setBattleResult(result);
-          setShowBattleModal(true);
-          // Limpar dados do localStorage
-          localStorage.removeItem("battleResult");
-
-          // Recarregar pokémons para atualizar estatísticas
-          console.log("🔄 Recarregando pokémons após resultado de batalha...");
-          fetchData();
-        } catch (error) {
-          console.error("Erro ao processar resultado da batalha:", error);
-          localStorage.removeItem("battleResult");
-        }
-      }
-    };
-
-    // Verificar imediatamente
-    checkBattleResult();
-
-    // Verificar quando a página ganha foco (usuário volta da batalha)
-    const handleFocus = () => {
-      checkBattleResult();
-    };
-
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, []);
 
   // Função para aplicar filtros e ordenação
   function getFilteredAndSortedPokemons() {
@@ -134,11 +90,6 @@ export default function Home() {
     });
     return sorted;
   }
-
-  const handleCloseBattleModal = () => {
-    setShowBattleModal(false);
-    setBattleResult(null);
-  };
 
   return (
     <RequireAuth>
@@ -257,14 +208,6 @@ export default function Home() {
             )}
           </div>
         </main>
-
-        {/* Battle Result Modal */}
-        <BattleResultModal
-          isOpen={showBattleModal}
-          onClose={handleCloseBattleModal}
-          pokemon={battleResult?.pokemon || null}
-          result={battleResult?.result || null}
-        />
       </div>
     </RequireAuth>
   );

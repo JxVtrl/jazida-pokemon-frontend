@@ -201,7 +201,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         rounds: number;
       }) => {
         console.log("🏆 Batalha finalizada:", data);
-        const { battle, trainer } = get();
+        const { battle } = get();
         if (battle) {
           set({
             battle: {
@@ -212,54 +212,12 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
             },
           });
 
-          // CORREÇÃO: Determinar qual pokémon é do treinador atual
-          // pokemonA sempre é do primeiro treinador, pokemonB do segundo
-          if (battle.pokemonA && battle.pokemonB) {
-            const myPokemon =
-              battle.pokemonA.treinador === trainer?.id
-                ? battle.pokemonA
-                : battle.pokemonB;
-            const isWinner = data.winner.id === myPokemon.id;
-            const isLoser = data.loser.id === myPokemon.id;
-
-            let result: "victory" | "defeat" | "death";
-            if (isWinner) {
-              result = "victory";
-            } else if (isLoser && data.loser.nivel <= 0) {
-              result = "death";
-            } else {
-              result = "defeat";
-            }
-
-            // Calcular nível anterior
-            let nivelAnterior = myPokemon.nivel;
-            if (isWinner) {
-              nivelAnterior = myPokemon.nivel - 1;
-            } else if (isLoser) {
-              nivelAnterior = myPokemon.nivel + 1;
-            }
-
-            const battleResult = {
-              pokemon: {
-                ...myPokemon,
-                nivelAnterior,
-              },
-              result,
-            };
-
-            localStorage.setItem("battleResult", JSON.stringify(battleResult));
-          }
-
           // Recarregar pokémons para atualizar estatísticas
           console.log("🔄 Recarregando pokémons após batalha...");
           get().fetchMyPokemons();
 
-          // Redirecionar para home após 3 segundos
-          setTimeout(() => {
-            if (typeof window !== "undefined") {
-              window.location.href = "/";
-            }
-          }, 3000);
+          // desconectar socket
+          get().disconnectSocket();
         }
       },
     );
