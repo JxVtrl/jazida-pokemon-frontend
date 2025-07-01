@@ -94,6 +94,7 @@ export default function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
             width={128}
             height={128}
             className="object-contain h-24 sm:h-32 w-auto drop-shadow-lg"
+            unoptimized
           />
         ) : (
           <span className="text-xs text-gray-400">Carregando...</span>

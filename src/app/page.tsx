@@ -8,11 +8,9 @@ import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import RequireAuth from "@/components/RequireAuth";
-import { useAuth } from "@/context/AuthContext";
 import type { Pokemon } from "@/types";
 
 export default function Home() {
-  const { user } = useAuth();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [activeTab, setActiveTab] = useState<
     "list" | "battle" | "challenges" | "history" | "profile"
@@ -41,11 +39,10 @@ export default function Home() {
   }
 
   useEffect(() => {
-    // Só buscar pokémons se o usuário estiver autenticado
-    if (user) {
+    if (activeTab === "list") {
       fetchData();
     }
-  }, [user]);
+  }, [activeTab]);
 
   // Função para aplicar filtros e ordenação
   function getFilteredAndSortedPokemons() {

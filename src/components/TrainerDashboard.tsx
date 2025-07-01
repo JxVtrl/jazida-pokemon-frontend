@@ -18,7 +18,7 @@ export default function TrainerDashboard() {
     setLoading(true);
     setError("");
     try {
-      const res = await api.get("/me/pokemons");
+      const res = await api.get("/me/pokemons/estatisticas");
       setPokemons(res.data || []);
     } catch {
       setError("Erro ao buscar seus pokémons.");

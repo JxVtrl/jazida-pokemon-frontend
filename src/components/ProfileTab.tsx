@@ -24,6 +24,10 @@ interface Pokemon {
   tipo: string;
   treinador: string;
   nivel: number;
+  batalhas?: number;
+  vitorias?: number;
+  derrotas?: number;
+  winRate?: number;
 }
 
 export default function ProfileTab() {
@@ -66,7 +70,7 @@ export default function ProfileTab() {
 
   const fetchPokemons = async () => {
     try {
-      const response = await api.get("/me/pokemons");
+      const response = await api.get("/me/pokemons/estatisticas");
       setPokemons(response.data);
     } catch (error) {
       console.error("Erro ao buscar pokémons:", error);
@@ -350,6 +354,22 @@ export default function ProfileTab() {
                     {profile.experience}
                   </p>
                   <p className="text-sm text-gray-600">Experiência</p>
+                </div>
+              </div>
+
+              {/* Estatísticas Detalhadas */}
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+                  <p className="text-2xl font-bold text-green-700">
+                    {profile.wins}
+                  </p>
+                  <p className="text-sm text-green-600">Vitórias</p>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
+                  <p className="text-2xl font-bold text-red-700">
+                    {profile.losses}
+                  </p>
+                  <p className="text-sm text-red-600">Derrotas</p>
                 </div>
               </div>
 

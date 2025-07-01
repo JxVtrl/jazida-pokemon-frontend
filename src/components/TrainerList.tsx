@@ -216,6 +216,24 @@ export default function TrainerList() {
               </div>
             </div>
 
+            {/* Estatísticas Detalhadas */}
+            <div className="grid grid-cols-3 gap-1 mb-4 text-xs">
+              <div className="text-center p-1 bg-green-50 rounded">
+                <div className="font-bold text-green-700">{trainer.wins}</div>
+                <div className="text-green-600">Vitórias</div>
+              </div>
+              <div className="text-center p-1 bg-red-50 rounded">
+                <div className="font-bold text-red-700">{trainer.losses}</div>
+                <div className="text-red-600">Derrotas</div>
+              </div>
+              <div className="text-center p-1 bg-blue-50 rounded">
+                <div className="font-bold text-blue-700">
+                  {trainer.experience}
+                </div>
+                <div className="text-blue-600">Exp</div>
+              </div>
+            </div>
+
             {/* Botão de Desafio */}
             <div className="mt-4 pt-4 border-t border-gray-100">
               <button

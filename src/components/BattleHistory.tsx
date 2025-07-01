@@ -28,7 +28,7 @@ export default function BattleHistory() {
     try {
       setLoading(true);
       console.log("🔍 Buscando histórico de batalhas...");
-      const response = await api.get("/battle-history");
+      const response = await api.get("/historico-batalha");
       console.log("✅ Histórico recebido:", response.data);
       setHistorico(response.data);
     } catch (error) {

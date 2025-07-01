@@ -19,13 +19,14 @@ export default function BattleResultModal() {
   )
     return null;
 
-  const didIWin = user?.id === battle.winner?.treinador;
+  const didIWin = user?.id === battle.winner?.treinador_id;
   const pokemon = didIWin ? battle.winner : battle.loser;
   const pokemonDied = pokemon?.nivel === 0;
 
   const nivelAnterior = (
     pokemon?.id === battle.pokemonA?.id ? battle.pokemonA : battle.pokemonB
   )?.nivel;
+  console.log(`nivelAnterior: ${nivelAnterior}`);
 
   const getResultTitle = () => {
     switch (true) {
@@ -97,6 +98,7 @@ export default function BattleResultModal() {
               width={128}
               height={128}
               className="w-32 h-32 object-contain mx-auto"
+              unoptimized
             />
           </div>
           <h3 className="text-xl font-bold text-gray-800 mb-2">

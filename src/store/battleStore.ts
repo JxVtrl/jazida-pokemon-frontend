@@ -12,6 +12,7 @@ interface BattlePokemon {
   id: number;
   tipo: string;
   treinador: string | number;
+  treinador_id: number;
   nivel: number;
   vida: number;
   vidaMaxima: number;

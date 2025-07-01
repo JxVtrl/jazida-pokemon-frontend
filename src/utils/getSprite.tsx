@@ -16,6 +16,7 @@ export function getSprite(tipo: string, nivel: number, back = false) {
         width={128}
         height={128}
         className="w-32 h-32 object-contain mx-auto"
+        unoptimized
       />
     );
   }
@@ -26,6 +27,7 @@ export function getSprite(tipo: string, nivel: number, back = false) {
       width={128}
       height={128}
       className="w-32 h-32 object-contain mx-auto"
+      unoptimized
     />
   );
 }
